@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { getConferenceRooms, getTodayBookings } from '../actions'
 import BookingForm from './BookingForm'
+import PrepQueueClient from './PrepQueueClient'
 
 export default async function ConferencePage() {
   const supabase = await createClient()
@@ -12,6 +13,11 @@ export default async function ConferencePage() {
 
   const rooms = await getConferenceRooms()
   const bookings = await getTodayBookings()
+
+  const role = user.user_metadata?.role || 'staff'
+  const isCleaner = role === 'housekeeper' || role === 'cleaner'
+
+  const prepTasks = bookings.filter((b: any) => b.prep_items && b.prep_items.length > 0 && !b.is_prepped)
 
   return (
     <div className="mx-auto max-w-5xl space-y-8">
@@ -25,22 +31,34 @@ export default async function ConferencePage() {
           Conference Rooms
         </h1>
         <p className="mt-1.5 text-sm text-neutral-500 dark:text-neutral-400">
-          Book a meeting room or view today's schedule.
+          {isCleaner ? "Today's room preparation queue." : "Book a meeting room or view today's schedule."}
         </p>
       </header>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-5">
         
-        {/* LEFT: Booking Form */}
+        {/* LEFT: Role-Based Action Area */}
         <div className="lg:col-span-2">
-          <div className="sticky top-8 rounded-3xl border border-white/60 bg-white/50 p-6 shadow-sm backdrop-blur-xl dark:border-neutral-800/60 dark:bg-neutral-900/50">
-            <h2 className="mb-5 text-lg font-bold text-neutral-900 dark:text-white">Book a Room</h2>
-            {rooms.length === 0 ? (
-              <p className="text-sm text-neutral-500">No rooms available.</p>
-            ) : (
-              <BookingForm rooms={rooms} />
-            )}
-          </div>
+          {isCleaner ? (
+            <div className="sticky top-8 rounded-3xl border border-white/60 bg-white/50 p-6 shadow-sm backdrop-blur-xl dark:border-neutral-800/60 dark:bg-neutral-900/50">
+              <h2 className="mb-5 text-lg font-bold text-neutral-900 dark:text-white">Today's Room Prep</h2>
+              
+              {prepTasks.length === 0 ? (
+                <p className="text-sm text-neutral-500">No rooms require prep right now.</p>
+              ) : (
+                <PrepQueueClient tasks={prepTasks} />
+              )}
+            </div>
+          ) : (
+            <div className="sticky top-8 rounded-3xl border border-white/60 bg-white/50 p-6 shadow-sm backdrop-blur-xl dark:border-neutral-800/60 dark:bg-neutral-900/50">
+              <h2 className="mb-5 text-lg font-bold text-neutral-900 dark:text-white">Book a Room</h2>
+              {rooms.length === 0 ? (
+                <p className="text-sm text-neutral-500">No rooms available.</p>
+              ) : (
+                <BookingForm rooms={rooms} />
+              )}
+            </div>
+          )}
         </div>
 
         {/* RIGHT: Today's Schedule */}
@@ -76,6 +94,16 @@ export default async function ConferencePage() {
                         {start} - {end}
                       </span>
                     </div>
+                    
+                    {booking.prep_items && booking.prep_items.length > 0 && (
+                      <div className="mt-1 flex items-center gap-2">
+                        <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ${booking.is_prepped ? 'bg-emerald-100/80 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' : 'bg-amber-100/80 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300'}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${booking.is_prepped ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                          {booking.is_prepped ? 'Ready' : 'Pending Prep'}
+                        </span>
+                      </div>
+                    )}
+
                     <div className="mt-1 flex items-center gap-2 text-xs font-medium text-neutral-500 dark:text-neutral-400">
                       <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                         <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />

@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { deleteNotice, getTodayTasks } from './actions'
+import EnableNotifications from '@/components/EnableNotifications'
 
 // ── Circular progress ring (server component – pure SVG) ────────────────────
 function ProgressRing({
@@ -70,19 +71,23 @@ export default async function PortalDashboard() {
   return (
     <div className="space-y-8">
       {/* ── Header ──────────────────────────────────────────────────────────── */}
-      <header>
-        <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
-          {today}
-        </p>
-        <h1 className="mt-1 text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
-          Welcome back, {email.split('@')[0]} 👋
-        </h1>
-        <p className="mt-1.5 text-sm text-neutral-500 dark:text-neutral-400">
-          Signed in as{' '}
-          <span className="font-semibold text-neutral-700 dark:text-neutral-300">
-            {formattedRole}
-          </span>
-        </p>
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-neutral-400 dark:text-neutral-500">
+            {today}
+          </p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
+            Welcome back, {email.split('@')[0]} 👋
+          </h1>
+          <p className="mt-1.5 text-sm text-neutral-500 dark:text-neutral-400">
+            Signed in as{' '}
+            <span className="font-semibold text-neutral-700 dark:text-neutral-300">
+              {formattedRole}
+            </span>
+          </p>
+        </div>
+        
+        <EnableNotifications />
       </header>
 
       {/* ── Stat Cards ──────────────────────────────────────────────────────── */}

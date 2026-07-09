@@ -648,6 +648,7 @@ export async function bookRoom(formData: FormData) {
   const startTime = formData.get('start_time') as string
   const endTime = formData.get('end_time') as string
   const title = formData.get('title') as string
+  const prepItems = formData.getAll('prep_items') as string[]
 
   if (!roomId || !bookingDate || !startTime || !endTime || !title?.trim()) {
     return { error: 'All fields are required.' }
@@ -690,6 +691,7 @@ export async function bookRoom(formData: FormData) {
     start_time: startTime,
     end_time: endTime,
     title: title.trim(),
+    prep_items: prepItems,
   })
 
   if (error) {
@@ -698,5 +700,66 @@ export async function bookRoom(formData: FormData) {
   }
 
   revalidatePath('/portal/conference')
+  return { success: true }
+}
+
+// ✅ Mark a room as prepped (Cleaners/Admins)
+export async function markRoomPrepped(bookingId: string) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: 'Not logged in.' }
+
+  const { error } = await supabase
+    .from('room_bookings')
+    .update({
+      is_prepped: true,
+      prepped_by: user.id,
+    })
+    .eq('id', bookingId)
+
+  if (error) {
+    console.error('Failed to mark room as prepped:', error)
+    return { error: error.message }
+  }
+
+  revalidatePath('/portal/conference')
+  return { success: true }
+}
+
+// ============================================
+// WEB PUSH NOTIFICATIONS
+// ============================================
+
+export async function saveSubscription(subscription: any) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return { error: 'Not logged in' }
+
+  // Check if subscription already exists to avoid duplicates
+  const { data: existing } = await supabase
+    .from('push_subscriptions')
+    .select('id')
+    .eq('user_id', user.id)
+    .contains('subscription', { endpoint: subscription.endpoint })
+    .single()
+
+  if (existing) {
+    return { success: true } // Already subscribed
+  }
+
+  const { error } = await supabase
+    .from('push_subscriptions')
+    .insert({
+      user_id: user.id,
+      subscription: subscription
+    })
+
+  if (error) {
+    console.error('Failed to save subscription:', error)
+    return { error: error.message }
+  }
+
   return { success: true }
 }

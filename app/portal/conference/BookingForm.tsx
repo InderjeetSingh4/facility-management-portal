@@ -115,10 +115,24 @@ export default function BookingForm({ rooms }: { rooms: any[] }) {
         </div>
       </div>
 
+      <div>
+        <label className="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+          Prep Requirements (Optional)
+        </label>
+        <div className="flex flex-wrap gap-3">
+          {['Water Bottles', 'Notepads & Pens', 'Snacks/Biscuits'].map((item) => (
+            <label key={item} className="flex cursor-pointer items-center gap-2 rounded-xl border border-white/60 bg-white/50 px-3 py-2 text-sm font-medium text-neutral-700 shadow-sm backdrop-blur-xl transition hover:bg-white/70 dark:border-neutral-700/60 dark:bg-neutral-800/50 dark:text-neutral-200 dark:hover:bg-neutral-800/70">
+              <input type="checkbox" name="prep_items" value={item} className="h-4 w-4 rounded border-neutral-300 text-blue-600 focus:ring-blue-500 dark:border-neutral-600 dark:bg-neutral-700 dark:ring-offset-neutral-900 dark:focus:ring-blue-600" />
+              {item}
+            </label>
+          ))}
+        </div>
+      </div>
+
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full rounded-xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+        className="mt-2 w-full rounded-xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
       >
         {isSubmitting ? 'Booking…' : 'Book Room'}
       </button>
