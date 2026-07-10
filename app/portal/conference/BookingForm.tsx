@@ -87,7 +87,7 @@ export default function BookingForm({ rooms }: { rooms: any[] }) {
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label htmlFor="start_time" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-secondary">
             Start Time

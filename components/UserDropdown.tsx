@@ -85,7 +85,7 @@ export default function UserDropdown({ email, fullName, formattedRole, initial, 
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-3 w-64 origin-top-right rounded-3xl border border-border bg-surface p-2 shadow-lg shadow-black/10 backdrop-blur-xl dark:shadow-2xl dark:shadow-black/40 animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute right-0 mt-3 w-64 origin-top-right rounded-3xl border border-border bg-white/95 dark:bg-neutral-900/95 p-2 shadow-xl shadow-black/10 backdrop-blur-3xl dark:shadow-2xl dark:shadow-black/40 animate-in fade-in zoom-in-95 duration-200">
           
           {/* User Info Block */}
           <div className="p-4 flex flex-col gap-1">
