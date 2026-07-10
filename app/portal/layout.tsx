@@ -14,12 +14,22 @@ export default async function PortalLayout({
     redirect('/')
   }
 
-  // Fetch full_name and approval_status from public.users
-  const { data: profile } = await supabase
+  // Fetch full_name, approval_status, and notifications_enabled from public.users
+  let { data: profile, error } = await supabase
     .from('users')
     .select('full_name, approval_status, notifications_enabled')
     .eq('id', user.id)
     .single()
+
+  // If it failed (likely because the migration for notifications_enabled hasn't been run), fallback
+  if (error) {
+    const fallback = await supabase
+      .from('users')
+      .select('full_name, approval_status')
+      .eq('id', user.id)
+      .single()
+    profile = fallback.data
+  }
 
   const approvalStatus = profile?.approval_status || user.app_metadata?.approval_status || 'pending'
   
