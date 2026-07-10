@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "NODE_OPTIONS='--dns-result-order=ipv4first' next dev",
-    "build": "next build",
+    "dev": "NODE_OPTIONS='--dns-result-order=ipv4first' next dev --webpack",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "next lint",
     "mobile:sync": "npx cap sync",
