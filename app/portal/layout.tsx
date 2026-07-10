@@ -28,7 +28,7 @@ export default async function PortalLayout({
       .select('full_name, approval_status')
       .eq('id', user.id)
       .single()
-    profile = fallback.data
+    profile = fallback.data as any
   }
 
   const approvalStatus = profile?.approval_status || user.app_metadata?.approval_status || 'pending'
