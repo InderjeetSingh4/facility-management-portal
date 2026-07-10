@@ -13,6 +13,26 @@ async function getPlantId(supabase: any, user: any) {
 }
 import { redirect } from 'next/navigation'
 
+// 🔔 Action to save notification preferences
+export async function setNotificationPreference(enabled: boolean) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Not authenticated' }
+  
+  const { error } = await supabase
+    .from('users')
+    .update({ notifications_enabled: enabled })
+    .eq('id', user.id)
+
+  if (error) {
+    console.error('Failed to update notification preference:', error)
+    return { success: false, error: error.message }
+  }
+  
+  revalidatePath('/portal')
+  return { success: true }
+}
+
 // 🗑️ Action to Delete a Notice
 export async function deleteNotice(id: string) {
   const supabase = await createClient()

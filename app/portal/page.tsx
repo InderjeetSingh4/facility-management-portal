@@ -1,7 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { deleteNotice } from './actions'
-import EnableNotifications from '@/components/EnableNotifications'
 import Image from 'next/image'
 import { Suspense } from 'react'
 import PageHeader from '@/components/PageHeader'
@@ -296,7 +295,6 @@ export default async function PortalDashboard() {
       <PageHeader
         title={`Welcome back, ${fullName}`}
         description={`${today} • Signed in as ${formattedRole}`}
-        action={<EnableNotifications />}
       />
 
       {plantId ? (

@@ -17,7 +17,7 @@ export default async function PortalLayout({
   // Fetch full_name and approval_status from public.users
   const { data: profile } = await supabase
     .from('users')
-    .select('full_name, approval_status')
+    .select('full_name, approval_status, notifications_enabled')
     .eq('id', user.id)
     .single()
 
@@ -42,6 +42,7 @@ export default async function PortalLayout({
       formattedRole={formattedRole} 
       initial={initial} 
       isAdmin={isAdmin}
+      notificationsEnabled={profile?.notifications_enabled ?? null}
     >
       {children}
     </PortalShell>

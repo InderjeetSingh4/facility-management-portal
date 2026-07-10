@@ -1,18 +1,22 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { LogOut } from 'lucide-react'
+import { LogOut, Bell, BellOff } from 'lucide-react'
 import { logOut } from '@/app/auth/actions'
+import { setNotificationPreference } from '@/app/portal/actions'
 
 interface UserDropdownProps {
   email: string
   fullName: string
   formattedRole: string
   initial: string
+  notificationsEnabled: boolean
 }
 
-export default function UserDropdown({ email, fullName, formattedRole, initial }: UserDropdownProps) {
+export default function UserDropdown({ email, fullName, formattedRole, initial, notificationsEnabled: initialNotifs }: UserDropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [notifsEnabled, setNotifsEnabled] = useState(initialNotifs)
+  const [isUpdating, setIsUpdating] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -47,6 +51,30 @@ export default function UserDropdown({ email, fullName, formattedRole, initial }
   else if (roleLower === 'housekeeper' || roleLower === 'cleaner') badgeCls = 'bg-warning/20 text-warning'
   else if (roleLower === 'employee') badgeCls = 'bg-secondary/20 text-secondary'
 
+  const toggleNotifications = async () => {
+    setIsUpdating(true)
+    try {
+      if (!notifsEnabled) {
+        const permission = await Notification.requestPermission()
+        if (permission === 'granted') {
+          await setNotificationPreference(true)
+          setNotifsEnabled(true)
+        } else {
+          alert('Permission for notifications was denied by your browser.')
+          await setNotificationPreference(false)
+          setNotifsEnabled(false)
+        }
+      } else {
+        await setNotificationPreference(false)
+        setNotifsEnabled(false)
+      }
+    } catch (error) {
+      console.error('Failed to toggle notifications:', error)
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
   return (
     <div className="relative" ref={dropdownRef}>
       <button
@@ -68,6 +96,26 @@ export default function UserDropdown({ email, fullName, formattedRole, initial }
                 {formattedRole}
               </span>
             </div>
+          </div>
+
+          <div className="my-1 h-px bg-border w-full" />
+
+          {/* Settings List */}
+          <div className="p-1">
+            <button
+              onClick={toggleNotifications}
+              disabled={isUpdating}
+              className="flex w-full items-center justify-between rounded-2xl px-4 py-3 text-sm font-semibold text-secondary transition-all hover:bg-surface-solid/50 hover:text-primary active:scale-[0.98] disabled:opacity-50"
+            >
+              <div className="flex items-center gap-3">
+                {notifsEnabled ? <Bell size={18} className="text-accent" /> : <BellOff size={18} />}
+                Push Notifications
+              </div>
+              <div className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2 focus-visible:ring-white/75 ${notifsEnabled ? 'bg-accent' : 'bg-surface-solid border border-border'}`}>
+                <span className="sr-only">Toggle notifications</span>
+                <span className={`pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out ${notifsEnabled ? 'translate-x-4' : 'translate-x-1'}`} />
+              </div>
+            </button>
           </div>
 
           <div className="my-1 h-px bg-border w-full" />

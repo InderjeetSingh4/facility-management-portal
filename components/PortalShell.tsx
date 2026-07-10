@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { Sun, Moon, LayoutDashboard, CheckSquare, AlertCircle, Calendar, LogOut, Users, BarChart } from "lucide-react"
 import { useEffect, useState } from "react"
 import UserDropdown from "./UserDropdown"
+import NotificationPrimer from "./NotificationPrimer"
 
 interface PortalShellProps {
   children: React.ReactNode
@@ -14,11 +15,13 @@ interface PortalShellProps {
   formattedRole: string
   initial: string
   isAdmin: boolean
+  notificationsEnabled: boolean | null
 }
 
-export default function PortalShell({ children, email, fullName, formattedRole, initial, isAdmin }: PortalShellProps) {
+export default function PortalShell({ children, email, fullName, formattedRole, initial, isAdmin, notificationsEnabled: initialNotificationsEnabled }: PortalShellProps) {
   const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
+  const [showPrimer, setShowPrimer] = useState(initialNotificationsEnabled === null)
   const pathname = usePathname()
 
   useEffect(() => setMounted(true), [])
@@ -114,6 +117,7 @@ export default function PortalShell({ children, email, fullName, formattedRole, 
               fullName={fullName}
               formattedRole={formattedRole}
               initial={initial}
+              notificationsEnabled={initialNotificationsEnabled === true}
             />
           </div>
         </header>
@@ -126,28 +130,31 @@ export default function PortalShell({ children, email, fullName, formattedRole, 
       </div>
 
       {/* MOBILE BOTTOM NAV (Hidden on Desktop) */}
-      <nav className="fixed bottom-0 left-0 z-50 w-full border-t border-border bg-surface-solid pb-[env(safe-area-inset-bottom)] pt-2 backdrop-blur-xl md:hidden shadow-[0_-4px_24px_rgba(0,0,0,0.04)] dark:shadow-[0_-4px_24px_rgba(0,0,0,0.2)]">
-        <div className="flex items-center justify-around px-2 pb-4 pt-2">
+      <div className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] left-4 right-4 z-50 md:hidden">
+        <nav className="flex items-center justify-around rounded-full border border-border bg-surface p-1.5 backdrop-blur-xl shadow-lg shadow-black/10 dark:shadow-xl dark:shadow-black/20">
           {navItems.map((item) => {
             const isActive = pathname === item.href
             return (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex flex-col items-center gap-1 rounded-lg p-2 transition-all ${
+                className={`flex flex-1 flex-col items-center justify-center gap-1 rounded-full py-2.5 transition-all ${
                   isActive
-                    ? "text-accent"
+                    ? "bg-accent/15 text-accent shadow-sm"
                     : "text-secondary hover:text-primary"
                 }`}
               >
-                <item.icon size={24} className={isActive ? "text-accent" : ""} />
-                <span className="text-[10px] font-medium">{item.name}</span>
+                <item.icon size={20} className={isActive ? "text-accent" : ""} />
+                <span className="text-[10px] font-bold tracking-wide">{item.name}</span>
               </Link>
             )
           })}
-        </div>
-      </nav>
+        </nav>
+      </div>
 
+      {mounted && showPrimer && (
+        <NotificationPrimer onDismiss={() => setShowPrimer(false)} />
+      )}
     </div>
   )
 }
