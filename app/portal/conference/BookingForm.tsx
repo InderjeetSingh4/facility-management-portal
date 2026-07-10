@@ -32,7 +32,7 @@ export default function BookingForm({ rooms }: { rooms: any[] }) {
   // Generate today's date in local YYYY-MM-DD format for default value
   const todayDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date())
 
-  const inputClasses = "w-full rounded-2xl border border-border bg-surface p-4 text-primary shadow-inner backdrop-blur-xl outline-none transition-all placeholder:text-muted focus:border-accent focus:bg-surface-solid/80 focus:ring-4 focus:ring-accent/20"
+  const inputClasses = "block w-full appearance-none rounded-2xl border border-border bg-surface p-4 text-primary shadow-inner backdrop-blur-xl outline-none transition-all placeholder:text-muted focus:border-accent focus:bg-surface-solid/80 focus:ring-4 focus:ring-accent/20"
 
   return (
     <form ref={formRef} action={handleSubmit} className="space-y-4">
@@ -77,14 +77,16 @@ export default function BookingForm({ rooms }: { rooms: any[] }) {
         <label htmlFor="booking_date" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-secondary">
           Date
         </label>
-        <input
-          id="booking_date"
-          name="booking_date"
-          type="date"
-          required
-          defaultValue={todayDate}
-          className={inputClasses}
-        />
+        <div className={inputClasses + " flex items-center px-0 py-0 overflow-hidden"}>
+          <input
+            id="booking_date"
+            name="booking_date"
+            type="date"
+            required
+            defaultValue={todayDate}
+            className="w-full h-full bg-transparent p-4 outline-none appearance-none cursor-pointer"
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -92,25 +94,29 @@ export default function BookingForm({ rooms }: { rooms: any[] }) {
           <label htmlFor="start_time" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-secondary">
             Start Time
           </label>
-          <input
-            id="start_time"
-            name="start_time"
-            type="time"
-            required
-            className={inputClasses}
-          />
+          <div className={inputClasses + " flex items-center px-0 py-0 overflow-hidden"}>
+            <input
+              id="start_time"
+              name="start_time"
+              type="time"
+              required
+              className="w-full h-full bg-transparent p-4 outline-none appearance-none cursor-pointer"
+            />
+          </div>
         </div>
         <div>
           <label htmlFor="end_time" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-secondary">
             End Time
           </label>
-          <input
-            id="end_time"
-            name="end_time"
-            type="time"
-            required
-            className={inputClasses}
-          />
+          <div className={inputClasses + " flex items-center px-0 py-0 overflow-hidden"}>
+            <input
+              id="end_time"
+              name="end_time"
+              type="time"
+              required
+              className="w-full h-full bg-transparent p-4 outline-none appearance-none cursor-pointer"
+            />
+          </div>
         </div>
       </div>
 
