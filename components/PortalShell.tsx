@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Sun, Moon, LayoutDashboard, CheckSquare, AlertCircle, Calendar, LogOut, Users, BarChart } from "lucide-react"
 import { useEffect, useState } from "react"
-import { logOut } from "@/app/auth/actions"
+import UserDropdown from "./UserDropdown"
 
 interface PortalShellProps {
   children: React.ReactNode
@@ -87,12 +87,7 @@ export default function PortalShell({ children, email, fullName, formattedRole, 
         </nav>
         
         <div className="p-4 mb-2">
-          <form action={logOut}>
-            <button type="submit" className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-secondary transition-all duration-300 hover:bg-border/50">
-              <LogOut size={18} />
-              Sign Out
-            </button>
-          </form>
+          {/* Sign Out moved to UserDropdown in Topbar */}
         </div>
       </aside>
 
@@ -114,9 +109,12 @@ export default function PortalShell({ children, email, fullName, formattedRole, 
                 {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
               </button>
             )}
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-accent text-accent-foreground text-sm font-semibold">
-              {initial}
-            </div>
+            <UserDropdown 
+              email={email}
+              fullName={fullName}
+              formattedRole={formattedRole}
+              initial={initial}
+            />
           </div>
         </header>
 
