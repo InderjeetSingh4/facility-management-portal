@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import IOSInstallPrompt from "@/components/iOSInstallPrompt";
+import InstallPrompt from "@/components/InstallPrompt";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -18,7 +18,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Facility Portal",
   description: "Premium Facility Management Dashboard",
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     title: "Portal",
@@ -40,7 +39,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-neutral-50 text-neutral-950 transition-colors duration-300 dark:bg-neutral-950 dark:text-neutral-50">
         <Providers>
           {children}
-          <IOSInstallPrompt />
+          <InstallPrompt />
           <Toaster
             position="top-center"
             toastOptions={{
