@@ -3,6 +3,7 @@
 import { useTheme } from "next-themes"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { motion, AnimatePresence } from "framer-motion"
 import { Sun, Moon, LayoutDashboard, CheckSquare, AlertCircle, Calendar, LogOut, Users, BarChart } from "lucide-react"
 import { useEffect, useState } from "react"
 import UserDropdown from "./UserDropdown"
@@ -53,14 +54,23 @@ export default function PortalShell({ children, email, fullName, formattedRole, 
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+                className={`relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-accent/15 text-accent"
+                    ? "text-accent"
                     : "text-secondary hover:bg-border/50"
                 }`}
               >
-                <item.icon size={18} className={isActive ? "text-accent" : ""} />
-                {item.name}
+                {isActive && (
+                  <motion.div
+                    layoutId="desktop-nav-pill"
+                    className="absolute inset-0 rounded-xl bg-accent/15"
+                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                  />
+                )}
+                <div className="relative z-10 flex items-center gap-3 w-full">
+                  <item.icon size={18} className={isActive ? "text-accent" : ""} />
+                  {item.name}
+                </div>
               </Link>
             )
           })}
@@ -74,14 +84,23 @@ export default function PortalShell({ children, email, fullName, formattedRole, 
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+                    className={`relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                       isActive
-                        ? "bg-accent/15 text-accent"
+                        ? "text-accent"
                         : "text-secondary hover:bg-border/50"
                     }`}
                   >
-                    <item.icon size={18} className={isActive ? "text-accent" : ""} />
-                    {item.name}
+                    {isActive && (
+                      <motion.div
+                        layoutId="desktop-nav-pill"
+                        className="absolute inset-0 rounded-xl bg-accent/15"
+                        transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                      />
+                    )}
+                    <div className="relative z-10 flex items-center gap-3 w-full">
+                      <item.icon size={18} className={isActive ? "text-accent" : ""} />
+                      {item.name}
+                    </div>
                   </Link>
                 )
               })}
@@ -122,10 +141,19 @@ export default function PortalShell({ children, email, fullName, formattedRole, 
           </div>
         </header>
 
-        <main className="flex-1 pb-24 md:pb-8 mt-4">
-          <div className="w-full max-w-[1600px] mx-auto px-6 md:px-10 xl:px-14 2xl:px-16">
-            {children}
-          </div>
+        <main className="flex-1 pb-24 md:pb-8 mt-4 relative">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.25, ease: "easeInOut" }}
+              className="w-full max-w-[1600px] mx-auto px-6 md:px-10 xl:px-14 2xl:px-16"
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
 
@@ -138,14 +166,23 @@ export default function PortalShell({ children, email, fullName, formattedRole, 
               <Link
                 key={item.name}
                 href={item.href}
-                className={`flex flex-1 flex-col items-center justify-center gap-1 rounded-full py-2.5 transition-all ${
+                className={`relative flex flex-1 flex-col items-center justify-center gap-1 rounded-full py-2.5 transition-colors ${
                   isActive
-                    ? "bg-accent/15 text-accent shadow-sm"
+                    ? "text-accent"
                     : "text-secondary hover:text-primary"
                 }`}
               >
-                <item.icon size={20} className={isActive ? "text-accent" : ""} />
-                <span className="text-[10px] font-bold tracking-wide">{item.name}</span>
+                {isActive && (
+                  <motion.div
+                    layoutId="mobile-nav-pill"
+                    className="absolute inset-0 rounded-full bg-accent/15 shadow-sm"
+                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                  />
+                )}
+                <div className="relative z-10 flex flex-col items-center gap-1">
+                  <item.icon size={20} className={isActive ? "text-accent" : ""} />
+                  <span className="text-[10px] font-bold tracking-wide">{item.name}</span>
+                </div>
               </Link>
             )
           })}
