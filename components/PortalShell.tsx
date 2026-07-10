@@ -117,7 +117,7 @@ export default function PortalShell({ children, email, fullName, formattedRole, 
       <div className="flex-1 flex flex-col md:pl-72 xl:pl-80 w-full min-w-0">
         
         {/* TOP HEADER */}
-        <header className="sticky top-4 z-50 flex h-16 items-center justify-between mx-4 md:mr-4 md:ml-0 rounded-3xl bg-surface backdrop-blur-xl border border-border shadow-lg shadow-black/5 dark:shadow-xl dark:shadow-black/20 px-6">
+        <header className="sticky top-[max(env(safe-area-inset-top),16px)] z-50 flex h-16 items-center justify-between mx-4 md:mr-4 md:ml-0 rounded-3xl bg-surface backdrop-blur-xl border border-border shadow-lg shadow-black/5 dark:shadow-xl dark:shadow-black/20 px-6">
           <div className="flex items-center gap-4">
             <span className="text-lg font-semibold tracking-tight text-primary">Facility Portal</span>
           </div>
@@ -141,7 +141,7 @@ export default function PortalShell({ children, email, fullName, formattedRole, 
           </div>
         </header>
 
-        <main className="flex-1 pb-24 md:pb-8 mt-4 relative">
+        <main className="flex-1 pb-24 md:pb-8 pt-[calc(env(safe-area-inset-top)+100px)] relative">
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}
