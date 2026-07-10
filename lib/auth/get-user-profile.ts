@@ -7,6 +7,7 @@ export interface UserProfile {
   role: UserRole
   plantId: string | null
   fullName: string
+  approvalStatus: string
 }
 
 /**
@@ -27,7 +28,7 @@ export async function getUserProfile(): Promise<UserProfile | null> {
 
   const { data: profile, error } = await supabase
     .from('users')
-    .select('id, role, plant_id, full_name')
+    .select('id, role, plant_id, full_name, approval_status')
     .eq('id', userId)
     .single()
 
@@ -38,5 +39,6 @@ export async function getUserProfile(): Promise<UserProfile | null> {
     role: profile.role,
     plantId: profile.plant_id,
     fullName: profile.full_name,
+    approvalStatus: profile.approval_status,
   }
 }

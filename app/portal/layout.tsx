@@ -14,12 +14,18 @@ export default async function PortalLayout({
     redirect('/')
   }
 
-  // Fetch full_name from public.users
+  // Fetch full_name and approval_status from public.users
   const { data: profile } = await supabase
     .from('users')
-    .select('full_name')
+    .select('full_name, approval_status')
     .eq('id', user.id)
     .single()
+
+  const approvalStatus = profile?.approval_status || user.app_metadata?.approval_status || 'pending'
+  
+  if (approvalStatus !== 'approved') {
+    redirect('/pending-approval')
+  }
 
   const role = user.user_metadata?.role || 'staff'
   const email = user.email || 'User'

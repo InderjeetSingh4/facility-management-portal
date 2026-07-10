@@ -11,6 +11,7 @@
 // ----------------------------------------------------------------------------
 
 export type UserRole = 'super_admin' | 'local_admin' | 'cleaner' | 'employee'
+export type ApprovalStatus = 'pending' | 'approved' | 'rejected'
 export type ComplaintStatus = 'pending' | 'reviewed' | 'resolved' | 'dismissed'
 export type NoticeColorTheme =
   | 'bg-red-500/10 text-red-700'
@@ -25,6 +26,7 @@ export interface Database {
           id: string
           plant_id: string | null
           role: UserRole
+          approval_status: ApprovalStatus
           full_name: string
           phone: string | null
           designation: string | null
@@ -37,6 +39,7 @@ export interface Database {
           id: string
           plant_id?: string | null
           role?: UserRole
+          approval_status?: ApprovalStatus
           full_name: string
           phone?: string | null
           designation?: string | null
@@ -46,6 +49,7 @@ export interface Database {
         Update: {
           plant_id?: string | null
           role?: UserRole
+          approval_status?: ApprovalStatus
           full_name?: string
           phone?: string | null
           designation?: string | null

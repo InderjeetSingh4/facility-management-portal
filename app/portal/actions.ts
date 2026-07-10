@@ -730,3 +730,177 @@ export async function saveSubscription(subscription: any) {
 
   return { success: true }
 }
+// ── Admin Approvals ────────────────────────────────────────────────────────
+export async function approveUser(userId: string) {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('users')
+    .update({ approval_status: 'approved' })
+    .eq('id', userId)
+
+  if (error) {
+    console.error('Failed to approve user:', error)
+    throw new Error('Failed to approve user')
+  }
+
+  revalidatePath('/portal/staff')
+}
+
+export async function rejectUser(userId: string) {
+  const supabase = await createClient()
+  const { error } = await supabase
+    .from('users')
+    .update({ approval_status: 'rejected' })
+    .eq('id', userId)
+
+  if (error) {
+    console.error('Failed to reject user:', error)
+    throw new Error('Failed to reject user')
+  }
+
+  revalidatePath('/portal/staff')
+}
+
+// ── Attendance ─────────────────────────────────────────────────────────────
+
+function calculateDistanceInMeters(lat1: number, lon1: number, lat2: number, lon2: number) {
+  const R = 6371e3 // Earth radius in meters
+  const dLat = (lat2 - lat1) * Math.PI / 180
+  const dLon = (lon2 - lon1) * Math.PI / 180
+  const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon/2) * Math.sin(dLon/2)
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a))
+  return R * c
+}
+
+export async function markAttendance(lat: number, lng: number) {
+  const supabase = await createClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
+
+  if (!user) {
+    return { success: false, message: 'Not authenticated' }
+  }
+
+  let plantId = user.app_metadata?.plant_id
+  
+  if (!plantId) {
+    const { data: profile } = await supabase.from('users').select('plant_id').eq('id', user.id).single()
+    plantId = profile?.plant_id
+  }
+
+  if (!plantId) {
+    return { success: false, message: 'No facility assigned to your account' }
+  }
+
+  // Check if attendance already marked today (in Asia/Kolkata timezone)
+  const todayDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date())
+
+  const { data: existingAttendance } = await supabase
+    .from('attendance')
+    .select('id, status')
+    .eq('user_id', user.id)
+    .gte('created_at', `${todayDate}T00:00:00+05:30`)
+    .lt('created_at', `${todayDate}T23:59:59+05:30`)
+    .limit(1)
+
+  if (existingAttendance && existingAttendance.length > 0) {
+    if (existingAttendance[0].status === 'present') {
+      return { success: false, message: 'Attendance already marked for today' }
+    }
+    // Delete previous rejected attempt so user can retry
+    await supabase
+      .from('attendance')
+      .delete()
+      .eq('id', existingAttendance[0].id)
+  }
+
+  // Fetch plant location
+  const { data: plant, error: plantError } = await supabase
+    .from('plants')
+    .select('latitude, longitude, geofence_radius_meters')
+    .eq('id', plantId)
+    .single()
+
+  if (plantError || !plant || plant.latitude === null || plant.longitude === null) {
+    return { success: false, message: 'Facility location data is missing. Contact an administrator.' }
+  }
+
+  const distance = calculateDistanceInMeters(lat, lng, plant.latitude, plant.longitude)
+  const isWithinRange = distance <= plant.geofence_radius_meters
+  const status = isWithinRange ? 'present' : 'rejected_out_of_range'
+
+  console.log('Inserting attendance for user:', user.id)
+  console.log('User app_metadata:', user.app_metadata)
+  console.log('Target plant_id:', plantId)
+  
+  const { error: insertError } = await supabase
+    .from('attendance')
+    .insert({
+      user_id: user.id,
+      plant_id: plantId,
+      check_in_latitude: lat,
+      check_in_longitude: lng,
+      distance_from_plant_meters: Math.round(distance),
+      status: status
+    })
+
+  if (insertError) {
+    console.error('Failed to mark attendance:', insertError)
+    return { success: false, message: `Failed to record attendance: ${insertError.message}` }
+  }
+
+  revalidatePath('/portal')
+  
+  if (!isWithinRange) {
+    return { 
+      success: false, 
+      message: `You appear to be ${Math.round(distance)}m away. You must be at the facility (within ${plant.geofence_radius_meters}m) to mark attendance.`
+    }
+  }
+
+  return { success: true, message: 'Attendance marked successfully' }
+}
+
+export async function markCheckOut() {
+  const supabase = await createClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
+
+  if (!user) {
+    return { success: false, message: 'Not authenticated' }
+  }
+
+  const todayDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date())
+
+  // Find today's successful attendance record that hasn't been checked out yet
+  const { data: existingAttendance } = await supabase
+    .from('attendance')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('status', 'present')
+    .is('check_out_time', null)
+    .gte('created_at', `${todayDate}T00:00:00+05:30`)
+    .lt('created_at', `${todayDate}T23:59:59+05:30`)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
+
+  if (!existingAttendance) {
+    return { success: false, message: 'No active check-in found for today' }
+  }
+
+  const { error } = await supabase
+    .from('attendance')
+    .update({ check_out_time: new Date().toISOString() })
+    .eq('id', existingAttendance.id)
+
+  if (error) {
+    console.error('Failed to mark checkout:', error)
+    return { success: false, message: 'Failed to record checkout' }
+  }
+
+  revalidatePath('/portal')
+  return { success: true, message: 'Checked out successfully' }
+}

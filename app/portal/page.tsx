@@ -48,8 +48,10 @@ function ProgressRing({
   )
 }
 
+import AttendanceWidget from '@/components/AttendanceWidget'
+
 // ── Streaming Data Component ────────────────────────────────────────────────
-async function DashboardStatsAndNotices({ plantId, isAdmin }: { plantId: string; isAdmin: boolean }) {
+async function DashboardStatsAndNotices({ plantId, isAdmin, isCleaner, userId }: { plantId: string; isAdmin: boolean; isCleaner: boolean; userId: string }) {
   const supabase = await createClient()
 
   const todayDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date())
@@ -57,18 +59,35 @@ async function DashboardStatsAndNotices({ plantId, isAdmin }: { plantId: string;
 
   const [
     { data: statsData },
-    { data: notices }
+    { data: notices },
+    { data: attendanceData }
   ] = await Promise.all([
     supabase.rpc('get_dashboard_stats', { p_plant_id: plantId, p_today: todayDate, p_dow: todayDOW }),
-    supabase.from('notices').select('*').order('created_at', { ascending: false })
+    supabase.from('notices').select('*').order('created_at', { ascending: false }),
+    isCleaner ? supabase
+      .from('attendance')
+      .select('status, created_at, check_out_time')
+      .eq('user_id', userId)
+      .gte('created_at', `${todayDate}T00:00:00+05:30`)
+      .lt('created_at', `${todayDate}T23:59:59+05:30`)
+      .limit(1)
+      .single() : Promise.resolve({ data: null })
   ])
 
   const totalToday = statsData?.totalTasks || 0
   const completedToday = statsData?.completedTasks || 0
   const pct = totalToday > 0 ? Math.round((completedToday / totalToday) * 100) : 0
 
+  const todayStatus = attendanceData?.status as 'present' | 'rejected_out_of_range' | null
+  const checkInTime = attendanceData?.created_at ? new Date(attendanceData.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : undefined
+  const checkOutTime = attendanceData?.check_out_time ? new Date(attendanceData.check_out_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : undefined
+
   return (
     <>
+      {isCleaner && (
+        <AttendanceWidget todayStatus={todayStatus} checkInTime={checkInTime} checkOutTime={checkOutTime} />
+      )}
+
       {/* ── Stat Cards ──────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 xl:gap-8 mt-8 xl:mt-10">
         {/* Tasks Today */}
@@ -255,6 +274,7 @@ export default async function PortalDashboard() {
   const role = user?.user_metadata?.role || 'staff'
   const formattedRole = role.replace('_', ' ').replace(/\b\w/g, (char: string) => char.toUpperCase())
   const isAdmin = role === 'local_admin' || role === 'super_admin'
+  const isCleaner = role === 'cleaner' || role === 'housekeeper'
   let plantId = user?.app_metadata?.plant_id
   let fullName = user?.user_metadata?.full_name
 
@@ -281,7 +301,7 @@ export default async function PortalDashboard() {
 
       {plantId ? (
         <Suspense fallback={<DashboardSkeleton />}>
-          <DashboardStatsAndNotices plantId={plantId} isAdmin={isAdmin} />
+          <DashboardStatsAndNotices plantId={plantId} isAdmin={isAdmin} isCleaner={isCleaner} userId={user?.id || ''} />
         </Suspense>
       ) : (
         <div className="mt-8 xl:mt-10 text-secondary">No facility assigned.</div>

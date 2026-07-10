@@ -46,9 +46,9 @@ function TaskCard({ task, isAdmin, currentUserId, isCompleted }: { task: any, is
   }
 
   return (
-    <div className={`group relative overflow-hidden rounded-3xl border border-border bg-surface p-5 xl:p-8 shadow-sm backdrop-blur-xl transition-all hover:bg-surface-solid/50 hover:shadow-md ${isCompleted ? 'opacity-75 bg-surface-solid/30' : ''}`}>
+    <div className={`group relative overflow-hidden rounded-3xl border border-border bg-surface p-6 xl:p-8 shadow-sm backdrop-blur-xl transition-all hover:bg-surface-solid/50 hover:shadow-md ${isCompleted ? 'opacity-75 bg-surface-solid/30' : ''}`}>
       <div className="flex items-start justify-between">
-        <h3 className={`font-bold text-primary pr-8 ${isCompleted ? 'line-through' : ''}`}>{task.title}</h3>
+        <h3 className={`font-bold text-lg xl:text-xl text-primary pr-8 ${isCompleted ? 'line-through' : ''}`}>{task.title}</h3>
         {isAdmin && (
           <button 
             onClick={handleDelete}
@@ -65,14 +65,14 @@ function TaskCard({ task, isAdmin, currentUserId, isCompleted }: { task: any, is
       </div>
       
       {task.target_date && !isCompleted && (
-        <div className="mt-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-muted">
+        <div className="mt-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-muted">
           <Clock size={14} />
           <span>Due {new Date(task.target_date).toLocaleDateString()}</span>
         </div>
       )}
 
       {isCompleted && task.completions && task.completions.length > 0 && (
-        <div className="mt-4 flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-success">
+        <div className="mt-4 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-success">
           <CheckCircle2 size={14} />
           <span>Completed</span>
         </div>
@@ -81,7 +81,7 @@ function TaskCard({ task, isAdmin, currentUserId, isCompleted }: { task: any, is
       <button 
         onClick={handleToggle}
         disabled={isPending || isDeleting}
-        className={`mt-4 w-full rounded-xl border py-2 text-sm font-medium shadow-sm transition-all ${
+        className={`mt-5 w-full rounded-xl border py-3 text-sm font-semibold shadow-sm transition-all ${
           isCompleted 
             ? 'border-border bg-surface-solid/50 text-secondary hover:bg-surface hover:text-primary' 
             : 'border-border bg-surface-solid/50 text-secondary hover:bg-accent hover:text-accent-foreground hover:border-accent'

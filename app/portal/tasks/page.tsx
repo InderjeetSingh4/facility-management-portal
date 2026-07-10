@@ -12,17 +12,17 @@ async function TasksContent({ isAdmin, userId }: { isAdmin: boolean, userId: str
   const completeds = tasks.filter((t: any) => t.isCompleted)
 
   return (
-    <div className="grid gap-6 xl:gap-8 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-8 xl:gap-10 md:grid-cols-2">
       {/* Column: To Do */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 px-2">
-          <Circle size={16} className="text-muted" />
-          <h2 className="text-xs font-bold uppercase tracking-wider text-secondary">To Do ({toDos.length})</h2>
+          <Circle size={18} className="text-muted" />
+          <h2 className="text-sm xl:text-base font-bold uppercase tracking-wider text-secondary">To Do ({toDos.length})</h2>
         </div>
         
         {toDos.length === 0 && (
-          <div className="rounded-3xl border border-dashed border-border bg-surface-solid/30 p-8 text-center backdrop-blur-xl">
-            <p className="text-sm text-secondary">All tasks complete!</p>
+          <div className="rounded-3xl border border-dashed border-border bg-surface-solid/30 p-12 text-center backdrop-blur-xl">
+            <p className="text-base text-secondary">All tasks complete!</p>
           </div>
         )}
 
@@ -32,13 +32,13 @@ async function TasksContent({ isAdmin, userId }: { isAdmin: boolean, userId: str
       {/* Column: Completed */}
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 px-2">
-          <CheckCircle2 size={16} className="text-success" />
-          <h2 className="text-xs font-bold uppercase tracking-wider text-secondary">Completed ({completeds.length})</h2>
+          <CheckCircle2 size={18} className="text-success" />
+          <h2 className="text-sm xl:text-base font-bold uppercase tracking-wider text-secondary">Completed ({completeds.length})</h2>
         </div>
         
         {completeds.length === 0 && (
-          <div className="rounded-3xl border border-dashed border-border bg-surface-solid/30 p-8 text-center backdrop-blur-xl opacity-75">
-            <p className="text-sm text-secondary">No tasks completed yet.</p>
+          <div className="rounded-3xl border border-dashed border-border bg-surface-solid/30 p-12 text-center backdrop-blur-xl opacity-75">
+            <p className="text-base text-secondary">No tasks completed yet.</p>
           </div>
         )}
 
@@ -50,7 +50,7 @@ async function TasksContent({ isAdmin, userId }: { isAdmin: boolean, userId: str
 
 function TasksSkeleton() {
   return (
-    <div className="grid gap-6 xl:gap-8 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid gap-8 xl:gap-10 md:grid-cols-2">
       <div className="flex flex-col gap-4">
         <div className="rounded-3xl bg-surface-solid/50 h-[200px] animate-pulse"></div>
         <div className="rounded-3xl bg-surface-solid/50 h-[200px] animate-pulse"></div>
