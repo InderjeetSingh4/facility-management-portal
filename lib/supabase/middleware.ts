@@ -28,8 +28,9 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // Securely fetch the current user's status from Supabase
-  const { data: { user } } = await supabase.auth.getUser()
+  // Securely fetch the current user's session locally (fast, no network roundtrip)
+  const { data: { session } } = await supabase.auth.getSession()
+  const user = session?.user
 
   // Define which pages don't require being logged in
   const isAuthRoute = request.nextUrl.pathname.startsWith('/login') || 

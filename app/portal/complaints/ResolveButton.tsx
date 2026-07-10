@@ -12,12 +12,8 @@ export default function ResolveButton({ complaintId }: { complaintId: string }) 
       disabled={isPending}
       onClick={() => startTransition(() => resolveComplaint(complaintId))}
       className={`
-        inline-flex items-center gap-1.5 rounded-xl border border-emerald-200 bg-emerald-50/60
-        px-3.5 py-2 text-xs font-semibold text-emerald-700 backdrop-blur-sm
-        transition-all hover:bg-emerald-100/80 hover:shadow-sm
-        active:scale-95
-        dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-400 dark:hover:bg-emerald-500/20
-        ${isPending ? 'scale-95 opacity-60' : ''}
+        inline-flex items-center gap-1.5 bg-accent text-accent-foreground rounded-2xl px-4 py-2 text-sm font-medium shadow-md transition-all hover:scale-105 hover:opacity-90 active:scale-95
+        ${isPending ? 'opacity-60 scale-95' : ''}
       `}
     >
       {isPending ? (

@@ -73,8 +73,10 @@ export default function EnableNotifications() {
     <button
       onClick={subscribeButtonOnClick}
       disabled={isSubscribed || isLoading}
-      className={`inline-flex h-fit items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-neutral-800 shadow-sm backdrop-blur-md transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50 dark:border-neutral-700/60 dark:bg-neutral-800/50 dark:text-neutral-200 dark:hover:bg-neutral-800/70 ${
-        isSubscribed ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-500/20 dark:text-emerald-400' : ''
+      className={`inline-flex h-fit items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium shadow-sm transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 ${
+        isSubscribed 
+          ? 'bg-white/40 border border-white/60 text-neutral-500 backdrop-blur-md' 
+          : 'bg-neutral-900 text-white hover:bg-neutral-800'
       }`}
     >
       <span>🔔</span>

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Providers } from "./providers";
+import IOSInstallPrompt from "@/components/iOSInstallPrompt";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -11,8 +14,6 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
-
-import IOSInstallPrompt from "@/components/iOSInstallPrompt";
 
 export const metadata: Metadata = {
   title: "Facility Portal",
@@ -34,10 +35,20 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col">
-        {children}
-        <IOSInstallPrompt />
+      <body className="min-h-full flex flex-col bg-neutral-50 text-neutral-950 transition-colors duration-300 dark:bg-neutral-950 dark:text-neutral-50">
+        <Providers>
+          {children}
+          <IOSInstallPrompt />
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              className:
+                "!rounded-2xl !border !border-neutral-200/50 !bg-white/60 !backdrop-blur-md !shadow-sm !shadow-neutral-100/40 !text-neutral-900 dark:!bg-neutral-900/60 dark:!border-neutral-800/50 dark:!shadow-none dark:!text-neutral-100",
+            }}
+          />
+        </Providers>
       </body>
     </html>
   );

@@ -3,6 +3,7 @@
 import { useRef, useState, type ChangeEvent } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { submitComplaint } from '../actions'
+import { toast } from 'sonner'
 
 export default function ComplaintForm() {
   const supabase = createClient()
@@ -54,7 +55,7 @@ export default function ComplaintForm() {
           .from('users')
           .select('plant_id')
           .eq('id', user.id)
-          .single()
+          .single() as { data: any }
 
         const plantId = profile?.plant_id || 'unknown'
         const fileExt = photoFile.name.split('.').pop()?.toLowerCase() || 'jpg'
@@ -84,7 +85,10 @@ export default function ComplaintForm() {
       const result = await submitComplaint(formData)
       if (result?.error) {
         setError(result.error)
+        toast.error('Failed to submit. Please try again.')
         setIsSubmitting(false)
+      } else {
+        toast.success('Complaint submitted successfully!')
       }
       // On success, the action redirects — no need to handle here
     } catch {
@@ -96,7 +100,7 @@ export default function ComplaintForm() {
     <form ref={formRef} action={handleSubmit} className="space-y-4">
       {/* Title */}
       <div>
-        <label htmlFor="complaint-title" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+        <label htmlFor="complaint-title" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-secondary">
           Title
         </label>
         <input
@@ -105,13 +109,13 @@ export default function ComplaintForm() {
           name="title"
           required
           placeholder="e.g. Leaking pipe in restroom"
-          className="w-full rounded-xl border border-neutral-200 bg-white/70 px-4 py-2.5 text-sm text-neutral-900 shadow-sm outline-none ring-emerald-500/40 transition placeholder:text-neutral-400 focus:ring-2 dark:border-neutral-700 dark:bg-neutral-800/70 dark:text-white dark:placeholder:text-neutral-500"
+          className="w-full rounded-2xl border border-border bg-surface p-4 text-primary shadow-inner backdrop-blur-xl outline-none transition-all placeholder:text-muted focus:border-accent focus:bg-surface-solid/80 focus:ring-4 focus:ring-accent/20"
         />
       </div>
 
       {/* Photo */}
       <div>
-        <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+        <label className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-secondary">
           Photo (optional)
         </label>
         <input
@@ -124,7 +128,7 @@ export default function ComplaintForm() {
         />
 
         {previewUrl ? (
-          <div className="relative overflow-hidden rounded-2xl border border-neutral-200 dark:border-neutral-700">
+          <div className="relative overflow-hidden rounded-2xl border border-border shadow-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={previewUrl} alt="Preview" className="h-44 w-full object-cover" />
             <div className="absolute bottom-2 right-2 flex gap-2">
@@ -151,7 +155,7 @@ export default function ComplaintForm() {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isSubmitting}
-            className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-neutral-300 bg-neutral-50/50 text-neutral-400 transition hover:border-neutral-400 hover:text-neutral-500 disabled:opacity-40 dark:border-neutral-700 dark:bg-neutral-800/30 dark:hover:border-neutral-600"
+            className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-surface-solid/30 text-muted transition hover:border-accent hover:text-secondary hover:bg-surface-solid/50 disabled:opacity-40 shadow-inner backdrop-blur-xl"
           >
             <svg className="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z" />
@@ -164,7 +168,7 @@ export default function ComplaintForm() {
 
       {/* Description */}
       <div>
-        <label htmlFor="complaint-description" className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
+        <label htmlFor="complaint-description" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-secondary">
           Description
         </label>
         <textarea
@@ -173,13 +177,13 @@ export default function ComplaintForm() {
           required
           placeholder="Describe the issue in detail..."
           rows={3}
-          className="w-full resize-none rounded-xl border border-neutral-200 bg-white/70 px-4 py-3 text-sm text-neutral-900 shadow-sm outline-none ring-emerald-500/40 transition placeholder:text-neutral-400 focus:ring-2 dark:border-neutral-700 dark:bg-neutral-800/70 dark:text-white dark:placeholder:text-neutral-500"
+          className="w-full rounded-2xl border border-border bg-surface p-4 text-primary shadow-inner backdrop-blur-xl outline-none transition-all placeholder:text-muted focus:border-accent focus:bg-surface-solid/80 focus:ring-4 focus:ring-accent/20 resize-none"
         />
       </div>
 
       {/* Error */}
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50/50 px-4 py-2.5 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-900/10 dark:text-red-400">
+        <div className="rounded-2xl border border-red-200 bg-red-50/50 px-4 py-2.5 text-sm text-red-700">
           {error}
         </div>
       )}
@@ -188,7 +192,7 @@ export default function ComplaintForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full rounded-xl bg-neutral-900 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-700 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+        className="w-full bg-accent text-accent-foreground rounded-2xl px-4 py-2 text-sm font-medium shadow-md transition-all hover:scale-105 hover:opacity-90 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {isSubmitting ? 'Submitting…' : 'Submit Complaint'}
       </button>

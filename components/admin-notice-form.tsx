@@ -22,8 +22,8 @@ export default function AdminNoticeForm() {
   }, [state.success])
 
   return (
-    <div className="rounded-3xl border border-white/60 bg-white/70 p-6 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl">
-      <h2 className="mb-5 text-lg font-semibold tracking-tight text-neutral-900">
+    <div className="rounded-3xl border border-border bg-surface p-6 shadow-sm backdrop-blur-xl">
+      <h2 className="mb-5 text-lg font-semibold tracking-tight text-primary">
         Post a notice
       </h2>
 
@@ -31,7 +31,7 @@ export default function AdminNoticeForm() {
         <div>
           <label
             htmlFor="notice-title"
-            className="mb-1.5 block text-xs font-medium text-neutral-600"
+            className="mb-1.5 block text-xs font-medium text-secondary"
           >
             Title
           </label>
@@ -42,14 +42,14 @@ export default function AdminNoticeForm() {
             required
             disabled={isPending}
             placeholder="e.g. Fire Drill on Friday"
-            className="w-full rounded-xl border border-neutral-200 bg-white/80 px-4 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-neutral-400 focus:ring-2 focus:ring-neutral-200 disabled:opacity-60"
+            className="w-full rounded-xl border border-border bg-surface-solid/50 px-4 py-2.5 text-sm text-primary outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:opacity-60"
           />
         </div>
 
         <div>
           <label
             htmlFor="notice-date"
-            className="mb-1.5 block text-xs font-medium text-neutral-600"
+            className="mb-1.5 block text-xs font-medium text-secondary"
           >
             Date
           </label>
@@ -60,14 +60,14 @@ export default function AdminNoticeForm() {
             required
             disabled={isPending}
             placeholder="e.g. July 10, 2026"
-            className="w-full rounded-xl border border-neutral-200 bg-white/80 px-4 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-neutral-400 focus:ring-2 focus:ring-neutral-200 disabled:opacity-60"
+            className="w-full rounded-xl border border-border bg-surface-solid/50 px-4 py-2.5 text-sm text-primary outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:opacity-60"
           />
         </div>
 
         <div>
           <label
             htmlFor="notice-theme"
-            className="mb-1.5 block text-xs font-medium text-neutral-600"
+            className="mb-1.5 block text-xs font-medium text-secondary"
           >
             Theme
           </label>
@@ -77,7 +77,7 @@ export default function AdminNoticeForm() {
             required
             disabled={isPending}
             defaultValue=""
-            className="w-full rounded-xl border border-neutral-200 bg-white/80 px-4 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-neutral-400 focus:ring-2 focus:ring-neutral-200 disabled:opacity-60"
+            className="w-full rounded-xl border border-border bg-surface-solid/50 px-4 py-2.5 text-sm text-primary outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:opacity-60"
           >
             <option value="" disabled>
               Select a theme…
@@ -93,7 +93,7 @@ export default function AdminNoticeForm() {
         <div>
           <label
             htmlFor="notice-details"
-            className="mb-1.5 block text-xs font-medium text-neutral-600"
+            className="mb-1.5 block text-xs font-medium text-secondary"
           >
             Details
           </label>
@@ -104,7 +104,7 @@ export default function AdminNoticeForm() {
             disabled={isPending}
             rows={3}
             placeholder="What do employees need to know?"
-            className="w-full resize-none rounded-2xl border border-neutral-200 bg-white/80 px-4 py-3 text-sm text-neutral-900 outline-none transition focus:border-neutral-400 focus:ring-2 focus:ring-neutral-200 disabled:opacity-60"
+            className="w-full resize-none rounded-2xl border border-border bg-surface-solid/50 px-4 py-3 text-sm text-primary outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:opacity-60"
           />
         </div>
 
@@ -112,7 +112,7 @@ export default function AdminNoticeForm() {
         <div>
           <label
             htmlFor="notice-image"
-            className="mb-1.5 block text-xs font-medium text-neutral-600"
+            className="mb-1.5 block text-xs font-medium text-secondary"
           >
             Attachment Image (Optional)
           </label>
@@ -122,7 +122,7 @@ export default function AdminNoticeForm() {
             type="file"
             accept="image/*"
             disabled={isPending}
-            className="w-full rounded-xl border border-neutral-200 bg-white/80 px-4 py-2 text-sm text-neutral-900 outline-none transition focus:border-neutral-400 focus:ring-2 focus:ring-neutral-200 disabled:opacity-60 file:mr-4 file:rounded-full file:border-0 file:bg-neutral-100 file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-neutral-700 hover:file:bg-neutral-200 transition-colors cursor-pointer"
+            className="w-full rounded-xl border border-border bg-surface-solid/50 px-4 py-2 text-sm text-primary outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/20 disabled:opacity-60 file:mr-4 file:rounded-full file:border-0 file:bg-surface-solid file:px-4 file:py-1.5 file:text-xs file:font-medium file:text-secondary hover:file:bg-surface-solid/80 transition-colors cursor-pointer"
           />
         </div>
 
@@ -147,7 +147,7 @@ export default function AdminNoticeForm() {
         <button
           type="submit"
           disabled={isPending}
-          className="w-full rounded-xl bg-neutral-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-xl bg-accent px-4 py-2.5 text-sm font-medium text-accent-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isPending ? 'Posting…' : 'Post notice'}
         </button>

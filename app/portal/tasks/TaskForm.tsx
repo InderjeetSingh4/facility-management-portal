@@ -14,9 +14,9 @@ const DAYS = [
 ]
 
 const inputCls =
-  'w-full rounded-xl border border-neutral-200 bg-white/70 px-4 py-2.5 text-sm text-neutral-900 shadow-sm outline-none ring-emerald-500/40 transition placeholder:text-neutral-400 focus:ring-2 dark:border-neutral-700 dark:bg-neutral-800/70 dark:text-white dark:placeholder:text-neutral-500'
+  'w-full rounded-2xl border border-border bg-surface p-4 text-primary shadow-inner backdrop-blur-xl outline-none transition-all placeholder:text-muted focus:border-accent focus:bg-surface-solid/80 focus:ring-4 focus:ring-accent/20'
 
-const labelCls = 'mb-1.5 block text-xs font-semibold uppercase tracking-wide text-neutral-500 dark:text-neutral-400'
+const labelCls = 'mb-1.5 block text-xs font-bold uppercase tracking-wider text-secondary'
 
 export default function TaskForm() {
   const [frequency, setFrequency] = useState('daily')
@@ -88,7 +88,7 @@ export default function TaskForm() {
 
       <button
         type="submit"
-        className="flex-shrink-0 rounded-xl bg-neutral-900 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-700 active:scale-95 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+        className="flex-shrink-0 bg-accent text-accent-foreground rounded-2xl px-4 py-2 text-sm font-medium shadow-md transition-all hover:scale-105 hover:opacity-90 active:scale-95 sm:mb-2"
       >
         Add Task
       </button>

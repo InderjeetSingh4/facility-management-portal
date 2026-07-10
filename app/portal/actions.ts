@@ -2,6 +2,15 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+
+async function getPlantId(supabase: any, user: any) {
+  let plantId = user?.app_metadata?.plant_id;
+  if (!plantId && user?.id) {
+    const { data } = await supabase.from('users').select('plant_id').eq('id', user.id).single();
+    plantId = data?.plant_id;
+  }
+  return plantId;
+}
 import { redirect } from 'next/navigation'
 
 // 🗑️ Action to Delete a Notice
@@ -102,14 +111,10 @@ export async function createTask(formData: FormData) {
     return
   }
 
-  const { data: adminProfile, error: profileError } = await supabase
-    .from('users')
-    .select('plant_id')
-    .eq('id', user.id)
-    .single()
+  const plantId = await getPlantId(supabase, user);
 
-  if (profileError || !adminProfile?.plant_id) {
-    console.error('Failed to resolve plant_id for current user:', profileError)
+  if (!plantId) {
+    console.error('Failed to resolve plant_id for current user from JWT')
     return
   }
 
@@ -118,7 +123,7 @@ export async function createTask(formData: FormData) {
     description: description || null,
     assigned_to: assignedTo,
     created_by: user.id,
-    plant_id: adminProfile.plant_id,
+    plant_id: plantId,
     task_type: 'general',
   })
 
@@ -195,14 +200,10 @@ export async function createChecklistTask(formData: FormData) {
     return
   }
 
-  const { data: profile, error: profileError } = await supabase
-    .from('users')
-    .select('plant_id')
-    .eq('id', user.id)
-    .single()
+  const plantId = await getPlantId(supabase, user);
 
-  if (profileError || !profile?.plant_id) {
-    console.error('Failed to resolve plant_id:', profileError)
+  if (!plantId) {
+    console.error('Failed to resolve plant_id from JWT')
     return
   }
 
@@ -211,7 +212,7 @@ export async function createChecklistTask(formData: FormData) {
     frequency,
     day_of_week: frequency === 'weekly' ? parseInt(dayOfWeekRaw, 10) : null,
     target_date: frequency === 'one-off' ? targetDate : null,
-    plant_id: profile.plant_id,
+    plant_id: plantId,
     created_by: user.id,
   })
 
@@ -300,13 +301,8 @@ export async function getTodayTasks() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('plant_id')
-    .eq('id', user.id)
-    .single()
-
-  if (!profile?.plant_id) return []
+  const plantId = await getPlantId(supabase, user);
+  if (!plantId) return []
 
   const today = getTodayIST()
   const todayDOW = getDayOfWeek(today)
@@ -315,7 +311,7 @@ export async function getTodayTasks() {
     .from('checklist_tasks')
     .select('*, checklist_completions(completed_by, completed_date)')
     .eq('checklist_completions.completed_date', today) // filters the nested array, keeps parent rows (left join)
-    .eq('plant_id', profile.plant_id)
+    .eq('plant_id', plantId)
     .or(`frequency.eq.daily,and(frequency.eq.weekly,day_of_week.eq.${todayDOW}),and(frequency.eq.one-off,target_date.eq.${today})`)
     .order('created_at', { ascending: true })
 
@@ -379,20 +375,14 @@ export async function submitComplaint(formData: FormData) {
     return { error: 'Only admins can submit complaints.' }
   }
 
-  // Get the user's plant_id from the users table
-  const { data: profile, error: profileError } = await supabase
-    .from('users')
-    .select('plant_id')
-    .eq('id', user.id)
-    .single()
-
-  if (profileError || !profile?.plant_id) {
+  const plantId = await getPlantId(supabase, user);
+  if (!plantId) {
     return { error: 'Could not determine your facility. Contact your administrator.' }
   }
 
   const { error } = await supabase.from('complaints').insert({
     user_id: user.id,
-    plant_id: profile.plant_id,
+    plant_id: plantId,
     title: title.trim(),
     description: description.trim(),
     image_url: imageUrl || '',
@@ -442,19 +432,13 @@ export async function getComplaints() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  // Get user's plant_id for scoping
-  const { data: profile } = await supabase
-    .from('users')
-    .select('plant_id')
-    .eq('id', user.id)
-    .single()
-
-  if (!profile?.plant_id) return []
+  const plantId = await getPlantId(supabase, user);
+  if (!plantId) return []
 
   const { data: complaints, error } = await supabase
     .from('complaints')
     .select('*')
-    .eq('plant_id', profile.plant_id)
+    .eq('plant_id', plantId)
     .order('is_resolved', { ascending: true })    // active (false) first
     .order('created_at', { ascending: false })     // newest first within each group
 
@@ -506,15 +490,8 @@ export async function getWeeklyAnalytics() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return null
 
-  // Get user's plant_id
-  const { data: profile } = await supabase
-    .from('users')
-    .select('plant_id')
-    .eq('id', user.id)
-    .single()
-
-  if (!profile?.plant_id) return null
-  const plantId = profile.plant_id
+  const plantId = await getPlantId(supabase, user);
+  if (!plantId) return null
 
   // 1. Complaints Stats
   const { data: complaints } = await supabase
@@ -528,7 +505,7 @@ export async function getWeeklyAnalytics() {
   // 2. Tasks Completed (last 7 days)
   // Generate the last 7 days (YYYY-MM-DD)
   const last7Days: string[] = []
-  const chartData = []
+  const chartData: { date: string, name: string, completions: number }[] = []
   
   for (let i = 6; i >= 0; i--) {
     const d = new Date()
@@ -585,18 +562,13 @@ export async function getConferenceRooms() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('plant_id')
-    .eq('id', user.id)
-    .single()
-
-  if (!profile?.plant_id) return []
+  const plantId = await getPlantId(supabase, user);
+  if (!plantId) return []
 
   const { data: rooms, error } = await supabase
     .from('conference_rooms')
     .select('*')
-    .eq('plant_id', profile.plant_id)
+    .eq('plant_id', plantId)
     .order('name', { ascending: true })
 
   if (error) {
@@ -613,13 +585,8 @@ export async function getTodayBookings() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('plant_id')
-    .eq('id', user.id)
-    .single()
-
-  if (!profile?.plant_id) return []
+  const plantId = await getPlantId(supabase, user);
+  if (!plantId) return []
 
   const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date())
 
@@ -629,7 +596,7 @@ export async function getTodayBookings() {
       *,
       conference_rooms!inner(plant_id, name)
     `)
-    .eq('conference_rooms.plant_id', profile.plant_id)
+    .eq('conference_rooms.plant_id', plantId)
     .eq('booking_date', today)
     .order('start_time', { ascending: true })
 

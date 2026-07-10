@@ -23,11 +23,11 @@ export default function TaskCheckbox({
       className={`
         relative flex h-8 w-8 flex-shrink-0 items-center justify-center
         rounded-xl border-2 transition-all duration-200
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/60 focus-visible:ring-offset-2
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2
         ${
           isCompleted
-            ? 'border-emerald-500 bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.35)]'
-            : 'border-neutral-300 bg-white/70 hover:border-emerald-400 hover:bg-emerald-50/40 dark:border-neutral-600 dark:bg-neutral-800/70 dark:hover:border-emerald-500/60'
+            ? 'border-accent bg-accent shadow-sm'
+            : 'border-border bg-surface-solid/50 hover:border-accent hover:bg-surface-solid shadow-inner'
         }
         ${isPending ? 'scale-90 opacity-60' : 'scale-100'}
       `}
@@ -35,7 +35,7 @@ export default function TaskCheckbox({
       {/* Spinner while pending */}
       {isPending && (
         <svg
-          className="h-4 w-4 animate-spin text-neutral-400 dark:text-neutral-500"
+          className="h-4 w-4 animate-spin text-muted"
           fill="none"
           viewBox="0 0 24 24"
         >
@@ -51,7 +51,7 @@ export default function TaskCheckbox({
       {/* Checkmark */}
       {!isPending && isCompleted && (
         <svg
-          className="h-4 w-4 text-white"
+          className="h-4 w-4 text-accent-foreground"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"

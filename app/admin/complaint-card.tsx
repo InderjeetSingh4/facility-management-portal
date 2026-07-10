@@ -38,8 +38,8 @@ export default function ComplaintCard({ complaint }: ComplaintCardProps) {
   })
 
   return (
-    <article className="overflow-hidden rounded-3xl border border-white/60 bg-white/70 shadow-[0_8px_30px_rgba(0,0,0,0.06)] backdrop-blur-xl">
-      <div className="relative h-44 w-full bg-neutral-200">
+    <article className="overflow-hidden rounded-3xl border border-border bg-surface shadow-sm backdrop-blur-xl">
+      <div className="relative h-44 w-full bg-surface-solid">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={complaint.image_url}
@@ -54,13 +54,13 @@ export default function ComplaintCard({ complaint }: ComplaintCardProps) {
       </div>
 
       <div className="p-5">
-        <h2 className="text-base font-semibold tracking-tight text-neutral-900">
+        <h2 className="text-base font-semibold tracking-tight text-primary">
           {complaint.title}
         </h2>
-        <p className="mt-1.5 line-clamp-3 text-sm leading-relaxed text-neutral-500">
+        <p className="mt-1.5 line-clamp-3 text-sm leading-relaxed text-secondary">
           {complaint.description}
         </p>
-        <p className="mt-3 text-xs text-neutral-400">{formattedDate}</p>
+        <p className="mt-3 text-xs text-muted">{formattedDate}</p>
 
         {complaint.status !== 'resolved' && (
           <div className="mt-4">
