@@ -29,16 +29,17 @@ export default function AnimatedCanvas() {
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
       
-      {/* ── Soft Depth Blobs (Near transition zone) ── */}
-      <div className="absolute top-[30%] -left-[10%] w-[50%] h-[50%] rounded-full bg-surface-solid/40 blur-[120px]" />
-      <div className="absolute top-[40%] -right-[10%] w-[40%] h-[60%] rounded-full bg-slate-500/20 blur-[120px]" />
+      {/* ── Soft Depth Blobs ── */}
+      <div className="absolute top-[30%] -left-[10%] w-[50%] h-[50%] rounded-full bg-accent/5 dark:bg-accent/5 blur-[120px]" />
+      <div className="absolute top-[40%] -right-[10%] w-[40%] h-[60%] rounded-full bg-accent-dim/5 dark:bg-accent/5 blur-[120px]" />
       
-      {/* ── Dashed Connecting Line (Connecting top-left Building to bottom-right Calendar) ── */}
+      {/* ── Dashed Connecting Line ── */}
       <svg className="absolute inset-0 w-full h-full opacity-[0.05]" preserveAspectRatio="none">
         <motion.path
           d="M 10vw 15vh C 40vw 15vh, 60vw 80vh, 75vw 80vh"
           fill="none"
-          stroke="white"
+          stroke="currentColor"
+          className="text-slate-900 dark:text-accent"
           strokeWidth="2"
           strokeDasharray="8 8"
           initial={{ strokeDashoffset: 1000 }}
@@ -49,13 +50,10 @@ export default function AnimatedCanvas() {
 
       {/* ── Ambient Icons ── */}
       {icons.map((item, i) => {
-        const isDarkZone = item.top < 50;
-        const colorClass = isDarkZone ? 'text-white/15' : 'text-muted/20';
-
         return (
           <motion.div
             key={i}
-            className={`absolute ${colorClass}`}
+            className="absolute text-slate-400/20 dark:text-text-muted/20"
             style={{ top: `${item.top}%`, left: `${item.left}%` }}
             animate={{ 
               y: [0, -20, 0], 
