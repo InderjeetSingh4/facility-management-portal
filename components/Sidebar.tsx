@@ -33,14 +33,16 @@ export default function Sidebar({ email, formattedRole, initial, isAdmin }: Side
         href={href} 
         className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition-all duration-300 ${
           isActive 
-            ? 'bg-white/80 dark:bg-white/15 backdrop-blur-md border border-white/60 dark:border-white/20 shadow-sm text-slate-900 dark:text-white font-semibold' 
-            : 'text-slate-500 dark:text-text-muted font-medium hover:text-slate-800 dark:hover:text-text-primary hover:bg-white/40 dark:hover:bg-white/10'
+            ? 'bg-slate-900 text-white dark:bg-white dark:text-black font-semibold shadow-sm' 
+            : 'text-slate-600 dark:text-text-muted font-medium hover:text-slate-900 dark:hover:text-text-primary hover:bg-black/5 dark:hover:bg-bg-surface-raised'
         }`}
       >
-        <svg className={`h-4 w-4 flex-shrink-0 transition-colors ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-text-muted group-hover:text-slate-800 dark:group-hover:text-text-primary'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <svg className={`h-4 w-4 flex-shrink-0 transition-colors ${isActive ? 'text-white dark:text-black' : 'text-slate-500 dark:text-text-muted group-hover:text-slate-900 dark:group-hover:text-text-primary'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           {icon}
         </svg>
-        {name}
+        <span className={isActive ? "text-white dark:text-black font-semibold" : ""}>
+          {name}
+        </span>
       </Link>
     )
   }
