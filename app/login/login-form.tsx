@@ -147,7 +147,7 @@ export default function LoginForm() {
               <button
                 type="submit"
                 disabled={isPending}
-                className="flex items-center justify-center gap-2 w-[150px] bg-sky-400 hover:bg-sky-500 text-slate-950 dark:bg-sky-400 dark:hover:bg-sky-500 dark:text-slate-950 focus:ring-2 focus:ring-sky-400/50 rounded-[10px] py-[13px] text-[12px] font-[700] tracking-[0.08em] active:scale-[0.98] transition-all duration-150 disabled:opacity-70 disabled:cursor-not-allowed shadow-sm"
+                className="flex items-center justify-center gap-2 w-[150px] bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white focus:ring-2 focus:ring-indigo-500/40 rounded-[10px] py-[13px] text-[12px] font-[700] tracking-[0.08em] active:scale-[0.98] transition-all duration-150 disabled:opacity-70 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20"
               >
                 {isPending ? (
                   <>

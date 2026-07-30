@@ -147,7 +147,7 @@ export default function AdminNoticeForm() {
         <button
           type="submit"
           disabled={isPending}
-          className="w-full rounded-xl bg-sky-400 hover:bg-sky-500 text-slate-950 dark:bg-sky-400 dark:hover:bg-sky-500 dark:text-slate-950 focus:ring-2 focus:ring-sky-400/50 px-4 py-2.5 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-60 shadow-sm"
+          className="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white focus:ring-2 focus:ring-indigo-500/40 px-4 py-3 text-sm font-bold transition disabled:cursor-not-allowed disabled:opacity-60 shadow-md shadow-indigo-500/20"
         >
           {isPending ? 'Posting…' : 'Post notice'}
         </button>

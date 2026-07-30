@@ -23,9 +23,9 @@
   --text-secondary: #475569;
   --text-muted: #64748b;
 
-  /* Accent */
-  --accent: #2148c4;
-  --accent-hover: #1a3aa0;
+  /* Accent - Premium Indigo/Blue */
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
   --accent-foreground: #ffffff;
 
   /* Status Colors (Lightened slightly for light bg) */

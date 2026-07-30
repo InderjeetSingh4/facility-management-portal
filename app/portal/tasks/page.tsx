@@ -77,7 +77,7 @@ export default function TasksPage() {
         showBackButton={true}
         action={
           isAdmin ? (
-            <button className="inline-flex items-center gap-2 rounded-full bg-sky-400 hover:bg-sky-500 text-slate-950 dark:bg-sky-400 dark:hover:bg-sky-500 dark:text-slate-950 focus:ring-2 focus:ring-sky-400/50 px-5 py-2.5 text-sm font-bold active:scale-95 transition-all duration-200 shadow-md">
+            <button className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white focus:ring-2 focus:ring-indigo-500/40 px-5 py-2.5 text-sm font-bold active:scale-95 transition-all duration-200 shadow-md shadow-indigo-500/20">
               <Plus size={16} />
               New Task
             </button>
