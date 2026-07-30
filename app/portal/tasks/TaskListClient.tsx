@@ -120,54 +120,53 @@ export default function TaskListClient({ tasks: initialTasks, isAdmin, currentUs
         <div className="space-y-8">
           <AnimatePresence mode="popLayout">
             {tasks.length === 0 ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="text-center p-12"
-              >
+              <GlassCard className="p-12 text-center">
                 <p className="text-slate-600 dark:text-text-muted font-medium">No tasks found.</p>
-              </motion.div>
+              </GlassCard>
             ) : (
-              <>
+              <GlassCard className="p-0 overflow-hidden">
                 {/* Today Section */}
                 {todayTasks.length > 0 && (
-                  <motion.div variants={containerVariants} className="relative bg-white dark:bg-bg-surface rounded-[14px] overflow-hidden border border-black/5 dark:border-transparent mb-8">
-                    <div className="sticky top-[120px] z-10 bg-white/90 dark:bg-bg-surface/90 backdrop-blur-md px-6 py-4 border-b border-black/5 dark:border-border-dashed">
-                      <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-widest">Today</h3>
+                  <div>
+                    <div className="bg-black/[0.03] dark:bg-white/[0.03] px-6 py-3.5 border-b border-black/5 dark:border-white/10">
+                      <h3 className="text-xs font-bold text-slate-500 dark:text-text-muted uppercase tracking-widest">Today</h3>
                     </div>
-                    {todayTasks.map((task: any) => (
-                      <TaskRow
-                        key={task.id}
-                        task={task}
-                        isAdmin={isAdmin}
-                        currentUserId={currentUserId}
-                        isOffline={isOffline}
-                        setTasks={setTasks}
-                      />
-                    ))}
-                  </motion.div>
+                    <div className="divide-y divide-black/5 dark:divide-white/10">
+                      {todayTasks.map((task: any) => (
+                        <TaskRow
+                          key={task.id}
+                          task={task}
+                          isAdmin={isAdmin}
+                          currentUserId={currentUserId}
+                          isOffline={isOffline}
+                          setTasks={setTasks}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 )}
 
                 {/* Upcoming Section */}
                 {upcomingTasks.length > 0 && (
-                  <motion.div variants={containerVariants} className="relative bg-white dark:bg-bg-surface rounded-[14px] overflow-hidden border border-black/5 dark:border-transparent mb-8">
-                    <div className="sticky top-[120px] z-10 bg-white/90 dark:bg-bg-surface/90 backdrop-blur-md px-6 py-4 border-b border-black/5 dark:border-border-dashed">
-                      <h3 className="text-xs font-bold text-neutral-500 uppercase tracking-widest">Upcoming</h3>
+                  <div>
+                    <div className="bg-black/[0.03] dark:bg-white/[0.03] px-6 py-3.5 border-b border-black/5 dark:border-white/10 border-t border-black/5 dark:border-white/10">
+                      <h3 className="text-xs font-bold text-slate-500 dark:text-text-muted uppercase tracking-widest">Upcoming</h3>
                     </div>
-                    {upcomingTasks.map((task: any) => (
-                      <TaskRow
-                        key={task.id}
-                        task={task}
-                        isAdmin={isAdmin}
-                        currentUserId={currentUserId}
-                        isOffline={isOffline}
-                        setTasks={setTasks}
-                      />
-                    ))}
-                  </motion.div>
+                    <div className="divide-y divide-black/5 dark:divide-white/10">
+                      {upcomingTasks.map((task: any) => (
+                        <TaskRow
+                          key={task.id}
+                          task={task}
+                          isAdmin={isAdmin}
+                          currentUserId={currentUserId}
+                          isOffline={isOffline}
+                          setTasks={setTasks}
+                        />
+                      ))}
+                    </div>
+                  </div>
                 )}
-              </>
+              </GlassCard>
             )}
           </AnimatePresence>
         </div>
@@ -254,13 +253,8 @@ function TaskRow({
   }, [task.target_date])
 
   return (
-    <motion.div
-      layout
-      variants={itemVariants}
-      initial="hidden"
-      animate="show"
-      exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
-      className={`group relative overflow-hidden bg-transparent border-b border-black/5 dark:border-border-dashed last:border-b-0 p-6 flex items-center justify-between transition-all duration-200 hover:bg-black/5 dark:hover:bg-bg-surface-raised ${isCompleted ? 'opacity-60' : ''}`}
+    <div
+      className={`group relative bg-transparent p-6 flex items-center justify-between transition-colors duration-200 hover:bg-black/[0.03] dark:hover:bg-white/[0.03] ${isCompleted ? 'opacity-60' : ''}`}
     >
       {/* High Priority Glowing Edge */}
       {isHighPriority && !isCompleted && (
@@ -318,7 +312,7 @@ function TaskRow({
           </button>
         )}
       </div>
-    </motion.div>
+    </div>
   )
 }
 

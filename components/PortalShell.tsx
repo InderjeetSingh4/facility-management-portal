@@ -89,11 +89,11 @@ export default function PortalShell({
                 href={item.href}
                 className={`group flex items-center gap-3 rounded-[10px] px-4 py-2.5 mx-2 text-base font-medium transition-all duration-200 ${
                   isActive
-                    ? "bg-[#3b82f6] dark:bg-bg-surface-raised !text-white dark:!text-text-primary"
+                    ? "bg-slate-900 dark:bg-white/15 !text-white dark:!text-white shadow-sm"
                     : "!text-black/70 dark:!text-text-muted hover:bg-black/5 dark:hover:bg-bg-surface-raised hover:!text-black dark:hover:!text-text-primary"
                 }`}
               >
-                <item.icon size={20} className={`flex-shrink-0 ${!isActive ? "!text-black/50 dark:!text-text-muted group-hover:!text-black dark:group-hover:!text-text-primary" : "!text-white dark:!text-accent"}`} />
+                <item.icon size={20} className={`flex-shrink-0 ${!isActive ? "!text-black/50 dark:!text-text-muted group-hover:!text-black dark:group-hover:!text-text-primary" : "!text-white dark:!text-white"}`} />
                 {item.name}
               </Link>
             )
@@ -112,11 +112,11 @@ export default function PortalShell({
                     href={item.href}
                     className={`group flex items-center gap-3 rounded-[10px] px-4 py-2.5 mx-2 text-base font-medium transition-all duration-200 ${
                       isActive
-                        ? "bg-[#3b82f6] dark:bg-bg-surface-raised !text-white dark:!text-text-primary"
+                        ? "bg-slate-900 dark:bg-white/15 !text-white dark:!text-white shadow-sm"
                         : "!text-black/70 dark:!text-text-muted hover:bg-black/5 dark:hover:bg-bg-surface-raised hover:!text-black dark:hover:!text-text-primary"
                     }`}
                   >
-                    <item.icon size={20} className={`flex-shrink-0 ${!isActive ? "!text-black/50 dark:!text-text-muted group-hover:!text-black dark:group-hover:!text-text-primary" : "!text-white dark:!text-accent"}`} />
+                    <item.icon size={20} className={`flex-shrink-0 ${!isActive ? "!text-black/50 dark:!text-text-muted group-hover:!text-black dark:group-hover:!text-text-primary" : "!text-white dark:!text-white"}`} />
                     {item.name}
                   </Link>
                 )

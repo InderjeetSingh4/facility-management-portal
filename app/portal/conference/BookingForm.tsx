@@ -137,7 +137,7 @@ export default function BookingForm({ rooms }: { rooms: any[] }) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="mt-2 w-full bg-[#3b82f6] text-white dark:bg-accent dark:text-black rounded-[10px] px-4 py-4 text-sm font-bold shadow-md transition-all hover:scale-[1.02] hover:opacity-90 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSubmitting ? 'Booking…' : 'Book Room'}
       </button>

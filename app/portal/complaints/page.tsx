@@ -20,7 +20,7 @@ async function ComplaintsContent({ isAdmin }: { isAdmin: boolean }) {
     <div className="flex flex-col gap-8 w-full max-w-[1400px] mx-auto">
       {/* ── Admin Submit Form ── */}
       {isAdmin && (
-        <GlassCard className="p-7 dark:border-t-2 dark:border-t-accent dark:border-l-0 dark:border-r-0 dark:border-b-0 dark:!rounded-[14px]">
+        <GlassCard className="p-7 border border-black/5 dark:border-white/10 rounded-[14px]">
           <h2 className="text-lg font-heading font-bold text-slate-800 dark:text-text-primary mb-6 tracking-tight">Report a New Issue</h2>
           <ComplaintForm />
         </GlassCard>
@@ -28,31 +28,31 @@ async function ComplaintsContent({ isAdmin }: { isAdmin: boolean }) {
 
       {/* ── Kanban Board ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-        <KanbanLane title="New" complaints={newComplaints} isAdmin={isAdmin} colorClass="text-blue-500" />
-        <KanbanLane title="In Progress" complaints={inProgressComplaints} isAdmin={isAdmin} colorClass="text-amber-500" />
-        <KanbanLane title="Resolved" complaints={resolvedComplaints} isAdmin={isAdmin} colorClass="text-emerald-500" />
+        <KanbanLane title="New" complaints={newComplaints} isAdmin={isAdmin} />
+        <KanbanLane title="In Progress" complaints={inProgressComplaints} isAdmin={isAdmin} />
+        <KanbanLane title="Resolved" complaints={resolvedComplaints} isAdmin={isAdmin} />
       </div>
     </div>
   )
 }
 
-function KanbanLane({ title, complaints, isAdmin, colorClass }: { title: string, complaints: any[], isAdmin: boolean, colorClass: string }) {
+function KanbanLane({ title, complaints, isAdmin }: { title: string, complaints: any[], isAdmin: boolean }) {
   return (
-    <div className="flex flex-col bg-white dark:bg-bg-surface rounded-[14px] border border-black/5 dark:border-transparent overflow-hidden">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-black/5 dark:border-border-dashed bg-black/5 dark:bg-transparent">
-        <h3 className={`font-mono text-[11px] font-bold uppercase tracking-[1px] ${colorClass.replace('text-', 'text-').replace('-500', ' dark:text-accent')}`}>{title} ({complaints.length})</h3>
+    <div className="flex flex-col bg-white dark:bg-bg-surface rounded-[14px] border border-black/5 dark:border-white/10 overflow-hidden">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-black/5 dark:border-white/10 bg-black/[0.02] dark:bg-white/[0.02]">
+        <h3 className="text-xs font-semibold text-slate-600 dark:text-neutral-400 tracking-wider uppercase">{title} ({complaints.length})</h3>
       </div>
       
-      <div className="flex flex-col">
+      <div className="flex flex-col divide-y divide-black/5 dark:divide-white/10">
         {complaints.length === 0 ? (
            <div className="p-8 text-center">
              <p className="text-[13px] font-medium text-slate-500 dark:text-text-muted">No complaints in this lane.</p>
            </div>
         ) : (
           complaints.map(complaint => (
-            <div key={complaint.id} className="p-5 flex flex-col gap-3 border-b border-black/5 dark:border-border-dashed last:border-b-0 hover:bg-black/5 dark:hover:bg-bg-surface-raised transition-all duration-200">
+            <div key={complaint.id} className="p-5 flex flex-col gap-3 hover:bg-black/[0.02] dark:hover:bg-white/[0.02] transition-colors duration-200">
               <div className="flex justify-between items-start gap-3">
-                 <h4 className={`font-semibold text-sm leading-snug ${complaint.status === 'approved' ? 'line-through text-slate-500 dark:text-text-muted' : 'text-slate-800 dark:text-text-primary'}`}>
+                 <h4 className={`font-semibold text-sm leading-snug ${complaint.status === 'approved' ? 'line-through text-slate-400 dark:text-text-muted' : 'text-slate-900 dark:text-text-primary'}`}>
                    {complaint.title}
                  </h4>
                  <div className="flex-shrink-0">
@@ -60,11 +60,11 @@ function KanbanLane({ title, complaints, isAdmin, colorClass }: { title: string,
                  </div>
               </div>
               
-              <p className="text-[13px] text-slate-500 dark:text-text-muted line-clamp-2 leading-relaxed">
+              <p className="text-[13px] text-slate-600 dark:text-text-muted line-clamp-2 leading-relaxed">
                 {complaint.description}
               </p>
               
-              <div className="flex justify-between items-center mt-2 pt-3 border-t border-black/5 dark:border-border-hairline">
+              <div className="flex justify-between items-center mt-2 pt-3 border-t border-black/5 dark:border-white/10">
                 <span className="font-mono text-[10px] font-bold text-slate-400 dark:text-text-muted uppercase tracking-wider">
                    {new Date(complaint.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
                 </span>

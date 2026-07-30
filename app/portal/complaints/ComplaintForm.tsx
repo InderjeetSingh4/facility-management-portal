@@ -93,8 +93,8 @@ export default function ComplaintForm() {
     }
   }
 
-  const inputCls = 'w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-primary outline-none placeholder:text-muted focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all'
-  const labelCls = 'mb-1.5 block text-xs font-semibold uppercase tracking-widest text-secondary'
+  const inputCls = 'w-full rounded-[10px] border border-transparent bg-black/5 dark:bg-bg-surface-raised px-4 py-3 text-sm text-slate-900 dark:text-text-primary outline-none placeholder:text-slate-400 dark:placeholder:text-text-muted focus:border-dashed focus:border-blue-500 dark:focus:border-accent transition-all'
+  const labelCls = 'mb-1.5 block text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-text-muted'
 
   return (
     <form ref={formRef} action={handleSubmit} className="space-y-4">
@@ -124,7 +124,7 @@ export default function ComplaintForm() {
         />
 
         {previewUrl ? (
-          <div className="relative overflow-hidden rounded-2xl border border-slate-200 shadow-sm">
+          <div className="relative overflow-hidden rounded-[10px] border border-slate-200 dark:border-white/10 shadow-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={previewUrl} alt="Preview" className="h-44 w-full object-cover" />
             <div className="absolute bottom-3 right-3 flex gap-2">
@@ -132,7 +132,7 @@ export default function ComplaintForm() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isSubmitting}
-                className="rounded-full bg-primary/70 px-4 py-2 text-xs font-semibold text-surface hover:bg-primary/90 transition disabled:opacity-40"
+                className="rounded-[10px] bg-slate-900/80 dark:bg-white/80 px-4 py-2 text-xs font-semibold text-white dark:text-black hover:opacity-90 transition disabled:opacity-40"
               >
                 Retake
               </button>
@@ -140,7 +140,7 @@ export default function ComplaintForm() {
                 type="button"
                 onClick={removePhoto}
                 disabled={isSubmitting}
-                className="rounded-full bg-danger/80 px-4 py-2 text-xs font-semibold text-danger-foreground hover:bg-danger transition disabled:opacity-40"
+                className="rounded-[10px] bg-red-500/80 px-4 py-2 text-xs font-semibold text-white hover:bg-red-600 transition disabled:opacity-40"
               >
                 Remove
               </button>
@@ -151,7 +151,7 @@ export default function ComplaintForm() {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isSubmitting}
-            className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border bg-surface-muted text-secondary hover:border-accent/40 hover:bg-accent/10 hover:text-accent transition-all disabled:opacity-40"
+            className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-[10px] border border-dashed border-black/10 dark:border-white/15 bg-black/5 dark:bg-bg-surface-raised text-slate-500 dark:text-text-muted hover:border-blue-500 dark:hover:border-accent hover:text-blue-500 dark:hover:text-accent transition-all disabled:opacity-40"
           >
             <Camera size={24} />
             <span className="text-xs font-semibold">Tap to add a photo</span>
@@ -174,7 +174,7 @@ export default function ComplaintForm() {
 
       {/* Error */}
       {error && (
-        <div className="rounded-2xl border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger">
+        <div className="rounded-[10px] border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-500">
           {error}
         </div>
       )}
@@ -183,7 +183,7 @@ export default function ComplaintForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full rounded-full bg-primary text-primary-foreground px-5 py-3.5 text-sm font-semibold shadow-sm hover:bg-primary/90 active:scale-[0.98] transition-all disabled:opacity-50"
+        className="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSubmitting ? 'Submitting…' : 'Submit Complaint'}
       </button>
