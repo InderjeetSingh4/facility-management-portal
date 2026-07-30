@@ -193,7 +193,7 @@ export default function SignUpForm({ plants }: { plants: Plant[] }) {
               <button
                 type="submit"
                 disabled={isPending}
-                className="flex items-center justify-center gap-2 w-[150px] bg-[#3b82f6] hover:bg-[#2563eb] dark:bg-accent text-white dark:text-black rounded-[10px] py-[13px] text-[12px] font-[700] tracking-[0.08em] active:scale-[0.98] transition-all duration-150 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="flex items-center justify-center gap-2 w-[150px] bg-sky-400 hover:bg-sky-500 text-slate-950 dark:bg-sky-400 dark:hover:bg-sky-500 dark:text-slate-950 focus:ring-2 focus:ring-sky-400/50 rounded-[10px] py-[13px] text-[12px] font-[700] tracking-[0.08em] active:scale-[0.98] transition-all duration-150 disabled:opacity-70 disabled:cursor-not-allowed shadow-sm"
               >
                 {isPending ? (
                   <>

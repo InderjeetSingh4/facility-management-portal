@@ -183,7 +183,7 @@ export default function ComplaintForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-slate-900 hover:bg-slate-800 text-white font-medium py-3 px-4 rounded-xl transition-colors shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full bg-sky-400 hover:bg-sky-500 text-slate-950 dark:bg-sky-400 dark:hover:bg-sky-500 dark:text-slate-950 focus:ring-2 focus:ring-sky-400/50 font-bold py-3 px-4 rounded-xl transition-all shadow-sm disabled:cursor-not-allowed disabled:opacity-50"
       >
         {isSubmitting ? 'Submitting…' : 'Submit Complaint'}
       </button>
