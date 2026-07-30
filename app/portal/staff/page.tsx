@@ -3,24 +3,25 @@ import { redirect } from 'next/navigation'
 import Image from 'next/image'
 import { Suspense } from 'react'
 import PageHeader from '@/components/PageHeader'
+import { approveUser, rejectUser } from '../actions'
 
-const ROLE_BADGE: Record<string, { label: string; cls: string }> = {
-  super_admin: { label: 'Super Admin', cls: 'bg-transparent border border-accent text-accent' },
-  local_admin: { label: 'Admin',       cls: 'bg-transparent border border-primary text-primary dark:text-text-primary dark:border-text-primary' },
-  housekeeper: { label: 'Housekeeper', cls: 'bg-transparent border border-warning text-warning' },
-  cleaner:     { label: 'Cleaner',     cls: 'bg-transparent border border-warning text-warning' },
-  employee:    { label: 'Employee',    cls: 'bg-transparent border border-secondary text-secondary dark:text-text-muted dark:border-text-muted' },
+const ROLE_BADGE: Record<string, string> = {
+  super_admin: 'Super Admin',
+  local_admin: 'Facility Manager',
+  housekeeper: 'Housekeeper',
+  cleaner:     'Cleaner',
+  employee:    'Staff Member',
 }
 
-async function StaffContent({ plantId }: { plantId: string }) {
+async function StaffContent({ plantId, isSuperAdmin }: { plantId: string; isSuperAdmin: boolean }) {
   const supabase = await createClient()
-
   const todayDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date())
 
-  // Fetch all staff in the same plant
+  // Parallel data fetching
   const [
-    { data: staff, error },
-    { data: activeAttendances }
+    { data: staff },
+    { data: activeAttendances },
+    { data: pendingApprovals }
   ] = await Promise.all([
     supabase
       .from('users')
@@ -34,268 +35,261 @@ async function StaffContent({ plantId }: { plantId: string }) {
       .eq('status', 'present')
       .is('check_out_time', null)
       .gte('created_at', `${todayDate}T00:00:00+05:30`)
-      .lt('created_at', `${todayDate}T23:59:59+05:30`)
+      .lt('created_at', `${todayDate}T23:59:59+05:30`),
+    supabase
+      .from('users')
+      .select('id, full_name, role, plant_id, created_at')
+      .eq('approval_status', 'pending')
+      .order('created_at', { ascending: false })
   ])
-
-  if (error) {
-    console.error('Failed to fetch staff:', error)
-  }
 
   const staffList = staff || []
   const onDutyUserIds = new Set((activeAttendances || []).map(a => a.user_id))
+  const pendingList = (pendingApprovals || []).filter((u: any) => isSuperAdmin || u.plant_id === plantId)
 
-  // Split into housekeepers and management
-  const housekeepers = staffList.filter((m: any) => m.role === 'cleaner' || m.role === 'employee')
+  const housekeepers = staffList.filter((m: any) => m.role === 'cleaner' || m.role === 'employee' || m.role === 'housekeeper')
   const management = staffList.filter((m: any) => m.role === 'local_admin' || m.role === 'super_admin')
-
   const onDutyCount = housekeepers.filter((m: any) => onDutyUserIds.has(m.id)).length
+  const dutyPercentage = housekeepers.length > 0 ? Math.round((onDutyCount / housekeepers.length) * 100) : 0
 
   return (
-    <div className="mt-2 space-y-10">
-      {/* ── Housekeepers Section ──────────────────────────────────────────── */}
+    <div className="flex flex-col gap-8 w-full max-w-[1400px] mx-auto">
+      
+      {/* ── WIDGET 1: Quick Stats Summary Cards ───────────────────────────── */}
       <div>
-        <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-xl xl:text-2xl font-bold text-primary flex items-center gap-3">
-            🧹 Housekeeping Staff
-          </h2>
-          <span className="text-sm font-semibold text-secondary rounded-full bg-surface-solid/50 px-4 py-1.5">
-            {onDutyCount} of {housekeepers.length} on duty
-          </span>
+        <p className="text-xs font-semibold text-neutral-400 tracking-wider uppercase mb-3">
+          Overview & Metrics
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,1)] rounded-3xl p-6 hover:bg-white/[0.05] hover:border-white/20 transition-all duration-300">
+            <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">Total Facility Staff</p>
+            <div className="flex items-baseline justify-between">
+              <span className="text-3xl font-bold text-white font-mono">{staffList.length}</span>
+              <span className="bg-white/10 text-neutral-300 border border-white/10 rounded-md px-2 py-1 text-xs font-medium">Active</span>
+            </div>
+          </div>
+
+          <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,1)] rounded-3xl p-6 hover:bg-white/[0.05] hover:border-white/20 transition-all duration-300">
+            <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">Housekeeping On Duty</p>
+            <div className="flex items-baseline justify-between">
+              <span className="text-3xl font-bold text-white font-mono">{onDutyCount}</span>
+              <span className="bg-white/10 text-neutral-300 border border-white/10 rounded-md px-2 py-1 text-xs font-medium">Of {housekeepers.length}</span>
+            </div>
+          </div>
+
+          <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,1)] rounded-3xl p-6 hover:bg-white/[0.05] hover:border-white/20 transition-all duration-300">
+            <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">Shift Coverage</p>
+            <div className="flex items-baseline justify-between">
+              <span className="text-3xl font-bold text-white font-mono">{dutyPercentage}%</span>
+              <span className="bg-white/10 text-neutral-300 border border-white/10 rounded-md px-2 py-1 text-xs font-medium">Live</span>
+            </div>
+          </div>
+
+          <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,1)] rounded-3xl p-6 hover:bg-white/[0.05] hover:border-white/20 transition-all duration-300">
+            <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wider mb-2">Pending Approvals</p>
+            <div className="flex items-baseline justify-between">
+              <span className="text-3xl font-bold text-white font-mono">{pendingList.length}</span>
+              <span className="bg-white/10 text-neutral-300 border border-white/10 rounded-md px-2 py-1 text-xs font-medium">Action Needed</span>
+            </div>
+          </div>
+
         </div>
-
-        {housekeepers.length === 0 ? (
-          <div className="rounded-3xl border border-dashed border-border bg-surface p-12 xl:p-16 text-center backdrop-blur-xl">
-            <p className="text-3xl xl:text-4xl">👥</p>
-            <p className="mt-3 text-sm font-semibold text-secondary">
-              No housekeeping staff found
-            </p>
-          </div>
-        ) : (
-          <div className="flex flex-col bg-white dark:bg-bg-surface rounded-[14px] border border-black/5 dark:border-transparent overflow-hidden">
-            {housekeepers.map((member: any) => {
-              const badge = ROLE_BADGE[member.role] ?? { label: member.role || 'Staff', cls: 'bg-transparent border border-secondary text-secondary dark:text-text-muted dark:border-text-muted' }
-              const initials = (member.full_name || '?')
-                .split(' ')
-                .map((w: string) => w[0])
-                .join('')
-                .toUpperCase()
-                .slice(0, 2)
-
-              const isOnDuty = onDutyUserIds.has(member.id)
-
-              return (
-                <div
-                  key={member.id}
-                  className={`flex items-center gap-5 p-5 xl:p-6 border-b border-black/5 dark:border-border-dashed last:border-b-0 transition-all duration-200 hover:bg-black/5 dark:hover:bg-bg-surface-raised ${
-                    isOnDuty
-                      ? 'bg-success/5 dark:bg-success/5'
-                      : ''
-                  }`}
-                >
-                  {/* Avatar */}
-                  {member.avatar_url ? (
-                    <Image
-                      src={member.avatar_url}
-                      alt={member.full_name}
-                      width={56}
-                      height={56}
-                      className="h-14 w-14 flex-shrink-0 rounded-2xl object-cover"
-                    />
-                  ) : (
-                    <div className={`flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl text-base font-bold ${
-                      isOnDuty
-                        ? 'bg-success text-white'
-                        : 'bg-[#3b82f6] text-white dark:bg-[#3b82f6] dark:text-white'
-                    }`}>
-                      {initials}
-                    </div>
-                  )}
-
-                  {/* Info */}
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="truncate text-base xl:text-lg font-semibold text-primary">
-                        {member.full_name}
-                      </p>
-                      <span className={`flex-shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${badge.cls}`}>
-                        {badge.label}
-                      </span>
-                    </div>
-                    <p className="mt-1 truncate text-sm text-muted">
-                      {[member.designation, member.phone].filter(Boolean).join(' · ') || 'No details'}
-                    </p>
-                  </div>
-
-                  {/* Duty status */}
-                  <div className="flex-shrink-0">
-                    {isOnDuty ? (
-                      <span className="inline-flex items-center gap-2 rounded-full bg-success/20 px-4 py-1.5 text-xs font-semibold text-success">
-                        <span className="relative flex h-2.5 w-2.5">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" />
-                          <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success" />
-                        </span>
-                        On Duty
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-2 rounded-full bg-secondary/20 px-4 py-1.5 text-xs font-semibold text-secondary">
-                        <span className="h-2 w-2 rounded-full bg-secondary" />
-                        Off Duty
-                      </span>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
       </div>
 
-      {/* ── Management Section ────────────────────────────────────────────── */}
-      {management.length > 0 && (
+      {/* ── WIDGET 2: Pending Member Approvals Table ─────────────────────── */}
+      {pendingList.length > 0 && (
         <div>
-          <h2 className="mb-6 text-xl xl:text-2xl font-bold text-primary flex items-center gap-3">
-            🛡️ Management
-          </h2>
-          <div className="flex flex-col bg-white dark:bg-bg-surface rounded-[14px] border border-black/5 dark:border-transparent overflow-hidden">
-            {management.map((member: any) => {
-              const badge = ROLE_BADGE[member.role] ?? { label: member.role || 'Staff', cls: 'bg-transparent border border-secondary text-secondary dark:text-text-muted dark:border-text-muted' }
-              const initials = (member.full_name || '?')
-                .split(' ')
-                .map((w: string) => w[0])
-                .join('')
-                .toUpperCase()
-                .slice(0, 2)
+          <p className="text-xs font-semibold text-neutral-400 tracking-wider uppercase mb-3">
+            Pending Registration Approvals ({pendingList.length})
+          </p>
+          <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,1)] rounded-3xl p-6 md:p-8">
+            <div className="flex flex-col divide-y divide-white/10">
+              {pendingList.map((member: any) => {
+                const roleName = ROLE_BADGE[member.role] || member.role || 'Staff'
+                const initials = (member.full_name || '?')
+                  .split(' ')
+                  .map((w: string) => w[0])
+                  .join('')
+                  .toUpperCase()
+                  .slice(0, 2)
 
-              return (
-                <div
-                  key={member.id}
-                  className="flex items-center gap-5 p-5 xl:p-6 border-b border-black/5 dark:border-border-dashed last:border-b-0 transition-all duration-200 hover:bg-black/5 dark:hover:bg-bg-surface-raised"
-                >
-                  <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-accent/10 text-base font-bold text-accent">
-                    {initials}
+                return (
+                  <div key={member.id} className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                      <div className="h-11 w-11 rounded-2xl bg-white/10 border border-white/10 text-white font-bold text-sm flex items-center justify-center flex-shrink-0">
+                        {initials}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-base font-semibold text-white">{member.full_name}</h4>
+                          <span className="bg-white/10 text-neutral-300 border border-white/10 rounded-md px-2 py-0.5 text-xs">
+                            {roleName}
+                          </span>
+                        </div>
+                        <p className="text-xs text-neutral-400 mt-0.5">
+                          Applied on {new Date(member.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                      <form action={rejectUser.bind(null, member.id)}>
+                        <button
+                          type="submit"
+                          className="bg-white/10 text-neutral-300 hover:text-white hover:bg-white/20 border border-white/10 font-semibold py-2 px-4 rounded-xl text-xs transition-all"
+                        >
+                          Reject
+                        </button>
+                      </form>
+                      <form action={approveUser.bind(null, member.id)}>
+                        <button
+                          type="submit"
+                          className="bg-white text-black font-semibold hover:bg-neutral-200 py-2 px-4 rounded-xl text-xs transition-colors shadow-sm"
+                        >
+                          Approve Staff
+                        </button>
+                      </form>
+                    </div>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-base xl:text-lg font-semibold text-primary">
-                      {member.full_name}
-                    </p>
-                    <span className={`mt-1 inline-block rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${badge.cls}`}>
-                      {badge.label}
-                    </span>
-                  </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         </div>
       )}
+
+      {/* ── WIDGET 3: Housekeeping Staff Roster Data Table ───────────────── */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-semibold text-neutral-400 tracking-wider uppercase">
+            Housekeeping Staff ({housekeepers.length})
+          </p>
+          <span className="text-xs font-semibold text-neutral-400">
+            {onDutyCount} On Duty
+          </span>
+        </div>
+
+        <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,1)] rounded-3xl p-6 md:p-8">
+          {housekeepers.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="text-sm font-medium text-neutral-500">No housekeeping staff members found.</p>
+            </div>
+          ) : (
+            <div className="flex flex-col divide-y divide-white/10">
+              {housekeepers.map((member: any) => {
+                const roleName = ROLE_BADGE[member.role] || 'Staff'
+                const initials = (member.full_name || '?')
+                  .split(' ')
+                  .map((w: string) => w[0])
+                  .join('')
+                  .toUpperCase()
+                  .slice(0, 2)
+                const isOnDuty = onDutyUserIds.has(member.id)
+
+                return (
+                  <div key={member.id} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 min-w-0">
+                      {member.avatar_url ? (
+                        <Image
+                          src={member.avatar_url}
+                          alt={member.full_name}
+                          width={44}
+                          height={44}
+                          className="h-11 w-11 flex-shrink-0 rounded-2xl object-cover border border-white/10"
+                        />
+                      ) : (
+                        <div className="h-11 w-11 rounded-2xl bg-white/10 border border-white/10 text-white font-bold text-sm flex items-center justify-center flex-shrink-0">
+                          {initials}
+                        </div>
+                      )}
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-base font-semibold text-white truncate">{member.full_name}</h4>
+                          <span className="bg-white/10 text-neutral-300 border border-white/10 rounded-md px-2 py-0.5 text-xs flex-shrink-0">
+                            {roleName}
+                          </span>
+                        </div>
+                        <p className="text-xs text-neutral-400 mt-0.5 truncate">
+                          {[member.designation, member.phone].filter(Boolean).join(' · ') || 'Staff Member'}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex-shrink-0">
+                      {isOnDuty ? (
+                        <span className="bg-white/10 text-neutral-200 border border-white/20 rounded-md px-3 py-1 text-xs font-semibold flex items-center gap-1.5">
+                          <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
+                          On Duty
+                        </span>
+                      ) : (
+                        <span className="bg-white/[0.04] text-neutral-500 border border-white/5 rounded-md px-3 py-1 text-xs font-medium">
+                          Off Duty
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── WIDGET 4: Management Staff Table ─────────────────────────────── */}
+      {management.length > 0 && (
+        <div>
+          <p className="text-xs font-semibold text-neutral-400 tracking-wider uppercase mb-3">
+            Facility Executive Management ({management.length})
+          </p>
+          <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,1)] rounded-3xl p-6 md:p-8">
+            <div className="flex flex-col divide-y divide-white/10">
+              {management.map((member: any) => {
+                const roleName = ROLE_BADGE[member.role] || 'Manager'
+                const initials = (member.full_name || '?')
+                  .split(' ')
+                  .map((w: string) => w[0])
+                  .join('')
+                  .toUpperCase()
+                  .slice(0, 2)
+
+                return (
+                  <div key={member.id} className="py-4 first:pt-0 last:pb-0 flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="h-11 w-11 rounded-2xl bg-white/10 border border-white/10 text-white font-bold text-sm flex items-center justify-center flex-shrink-0">
+                        {initials}
+                      </div>
+                      <div className="min-w-0">
+                        <h4 className="text-base font-semibold text-white truncate">{member.full_name}</h4>
+                        <p className="text-xs text-neutral-400 mt-0.5">{member.phone || 'Executive Officer'}</p>
+                      </div>
+                    </div>
+                    <span className="bg-white/10 text-neutral-300 border border-white/10 rounded-md px-2.5 py-1 text-xs font-semibold">
+                      {roleName}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
 
 function StaffSkeleton() {
   return (
-    <div className="mt-8 space-y-4">
-      <div className="rounded-3xl bg-surface-solid/50 h-[100px] xl:h-[120px] animate-pulse"></div>
-      <div className="rounded-3xl bg-surface-solid/50 h-[100px] xl:h-[120px] animate-pulse"></div>
-      <div className="rounded-3xl bg-surface-solid/50 h-[100px] xl:h-[120px] animate-pulse"></div>
-    </div>
-  )
-}
-
-import { approveUser, rejectUser } from '../actions'
-
-async function PendingApprovalsContent({ plantId, isSuperAdmin }: { plantId: string, isSuperAdmin: boolean }) {
-  const supabase = await createClient()
-
-  let query = supabase
-    .from('users')
-    .select('id, full_name, role, plant_id, created_at')
-    .eq('approval_status', 'pending')
-    .order('created_at', { ascending: false })
-
-  if (!isSuperAdmin) {
-    query = query.eq('plant_id', plantId)
-  }
-
-  const { data: pending, error } = await query
-
-  if (error) {
-    console.error('Failed to fetch pending approvals:', error)
-  }
-
-  const pendingList = pending || []
-
-  if (pendingList.length === 0) {
-    return (
-      <div className="mb-12">
-        <h2 className="mb-6 text-xl xl:text-2xl font-bold text-primary flex items-center gap-3">
-          Pending Approvals (0)
-        </h2>
-        <div className="rounded-3xl border border-dashed border-border bg-surface p-12 text-center backdrop-blur-xl">
-          <p className="text-base text-secondary">No pending approvals at this time.</p>
-        </div>
+    <div className="w-full max-w-[1400px] mx-auto space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-6 h-28 animate-pulse" />
+        <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-6 h-28 animate-pulse" />
+        <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-6 h-28 animate-pulse" />
+        <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-6 h-28 animate-pulse" />
       </div>
-    )
-  }
-
-  return (
-    <div className="mb-12">
-      <h2 className="mb-6 text-xl xl:text-2xl font-bold text-primary flex items-center gap-3">
-        <span className="relative flex h-3 w-3">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
-        </span>
-        Pending Approvals ({pendingList.length})
-      </h2>
-      <div className="flex flex-col bg-white dark:bg-bg-surface rounded-[14px] border border-amber-500/20 dark:border-transparent overflow-hidden">
-        {pendingList.map((member: any) => {
-          const badge = ROLE_BADGE[member.role] ?? { label: member.role || 'Staff', cls: 'bg-transparent border border-secondary text-secondary dark:text-text-muted dark:border-text-muted' }
-          const initials = (member.full_name || '?')
-            .split(' ')
-            .map((w: string) => w[0])
-            .join('')
-            .toUpperCase()
-            .slice(0, 2)
-
-          return (
-            <div
-              key={member.id}
-              className="flex items-center gap-5 p-5 xl:p-6 border-b border-amber-200/50 dark:border-border-dashed last:border-b-0 transition-all duration-200 hover:bg-amber-50 dark:hover:bg-bg-surface-raised"
-            >
-              <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-2xl bg-amber-100 text-base font-bold text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
-                {initials}
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="truncate text-base xl:text-lg font-semibold text-primary">
-                    {member.full_name}
-                  </p>
-                  <span className={`flex-shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${badge.cls}`}>
-                    {badge.label}
-                  </span>
-                </div>
-                <p className="mt-1 truncate text-sm text-muted">
-                  Joined {new Date(member.created_at).toLocaleDateString()}
-                </p>
-              </div>
-
-              <div className="flex flex-shrink-0 items-center gap-3">
-                <form action={rejectUser.bind(null, member.id)}>
-                  <button type="submit" className="rounded-xl px-5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100 dark:text-red-400 dark:hover:bg-red-500/20">
-                    Reject
-                  </button>
-                </form>
-                <form action={approveUser.bind(null, member.id)}>
-                  <button type="submit" className="rounded-xl bg-neutral-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200">
-                    Approve
-                  </button>
-                </form>
-              </div>
-            </div>
-          )
-        })}
-      </div>
+      <div className="bg-white/[0.02] border border-white/10 rounded-3xl p-8 h-64 animate-pulse" />
     </div>
   )
 }
@@ -311,6 +305,7 @@ export default async function ManageStaffPage() {
   const isAdmin = role === 'local_admin' || role === 'super_admin'
   const isSuperAdmin = role === 'super_admin'
   let plantId = user.app_metadata?.plant_id
+
   if (!plantId && user.id) {
     const { data: profile } = await supabase.from('users').select('plant_id').eq('id', user.id).single()
     plantId = profile?.plant_id
@@ -319,28 +314,20 @@ export default async function ManageStaffPage() {
   if (!isAdmin) redirect('/portal')
 
   return (
-    <div className="animate-in fade-in duration-500">
-      
+    <div className="space-y-6">
       <PageHeader 
         title="Manage Staff"
+        description="Facility staff directory, live duty tracking, and pending member approvals."
         showBackButton={true}
       />
 
-      {/* ── Pending Approvals ────────────────────────────────────────────────── */}
-      {(plantId || isSuperAdmin) && (
-        <Suspense fallback={<StaffSkeleton />}>
-          <PendingApprovalsContent plantId={plantId || ''} isSuperAdmin={isSuperAdmin} />
-        </Suspense>
-      )}
-
-      {/* ── Staff List ──────────────────────────────────────────────────────── */}
       {plantId ? (
         <Suspense fallback={<StaffSkeleton />}>
-          <StaffContent plantId={plantId} />
+          <StaffContent plantId={plantId} isSuperAdmin={isSuperAdmin} />
         </Suspense>
       ) : (
-        <div className="mt-8 rounded-3xl border border-dashed border-border bg-surface p-12 text-center backdrop-blur-xl">
-          <p className="text-sm text-secondary">No facility assigned to your account.</p>
+        <div className="bg-white/[0.02] backdrop-blur-2xl border border-white/10 shadow-[0_8px_30px_rgb(0,0,0,1)] rounded-3xl p-12 text-center">
+          <p className="text-sm font-medium text-neutral-400">No facility assigned to your account.</p>
         </div>
       )}
     </div>
