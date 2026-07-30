@@ -31,13 +31,13 @@ export default function Sidebar({ email, formattedRole, initial, isAdmin }: Side
     return (
       <Link 
         href={href} 
-        className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-300 ${
+        className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition-all duration-300 ${
           isActive 
-            ? 'bg-surface-solid/50 text-primary' 
-            : 'text-secondary hover:bg-surface-solid/30 hover:text-primary'
+            ? 'bg-white/80 dark:bg-white/15 backdrop-blur-md border border-white/60 dark:border-white/20 shadow-sm text-slate-900 dark:text-white font-semibold' 
+            : 'text-slate-500 dark:text-text-muted font-medium hover:text-slate-800 dark:hover:text-text-primary hover:bg-white/40 dark:hover:bg-white/10'
         }`}
       >
-        <svg className={`h-4 w-4 flex-shrink-0 ${isActive ? 'text-primary' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <svg className={`h-4 w-4 flex-shrink-0 transition-colors ${isActive ? 'text-slate-900 dark:text-white' : 'text-slate-500 dark:text-text-muted group-hover:text-slate-800 dark:group-hover:text-text-primary'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           {icon}
         </svg>
         {name}

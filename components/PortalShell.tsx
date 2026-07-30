@@ -87,13 +87,20 @@ export default function PortalShell({
               <Link
                 key={item.name}
                 href={item.href}
-                className={`group flex items-center gap-3 rounded-[10px] px-4 py-2.5 mx-2 text-base font-medium transition-all duration-200 ${
+                className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 mx-2 text-base transition-all duration-200 ${
                   isActive
-                    ? "bg-slate-900 dark:bg-white/15 !text-white dark:!text-white shadow-sm"
-                    : "!text-black/70 dark:!text-text-muted hover:bg-black/5 dark:hover:bg-bg-surface-raised hover:!text-black dark:hover:!text-text-primary"
+                    ? "bg-white/80 dark:bg-white/15 backdrop-blur-md border border-white/60 dark:border-white/20 shadow-sm text-slate-900 dark:text-white font-semibold"
+                    : "text-slate-500 dark:text-text-muted font-medium hover:text-slate-800 dark:hover:text-text-primary hover:bg-white/40 dark:hover:bg-white/10"
                 }`}
               >
-                <item.icon size={20} className={`flex-shrink-0 ${!isActive ? "!text-black/50 dark:!text-text-muted group-hover:!text-black dark:group-hover:!text-text-primary" : "!text-white dark:!text-white"}`} />
+                <item.icon
+                  size={20}
+                  className={`flex-shrink-0 transition-colors ${
+                    isActive
+                      ? "text-slate-900 dark:text-white"
+                      : "text-slate-500 dark:text-text-muted group-hover:text-slate-800 dark:group-hover:text-text-primary"
+                  }`}
+                />
                 {item.name}
               </Link>
             )
@@ -101,7 +108,7 @@ export default function PortalShell({
 
           {isAdmin && (
             <>
-              <p className="mb-2 mt-8 px-3 text-xs font-semibold uppercase tracking-wider !text-black/50 dark:!text-neutral-400">
+              <p className="mb-2 mt-8 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-neutral-400">
                 Management
               </p>
               {adminItems.map((item) => {
@@ -110,13 +117,20 @@ export default function PortalShell({
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`group flex items-center gap-3 rounded-[10px] px-4 py-2.5 mx-2 text-base font-medium transition-all duration-200 ${
+                    className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 mx-2 text-base transition-all duration-200 ${
                       isActive
-                        ? "bg-slate-900 dark:bg-white/15 !text-white dark:!text-white shadow-sm"
-                        : "!text-black/70 dark:!text-text-muted hover:bg-black/5 dark:hover:bg-bg-surface-raised hover:!text-black dark:hover:!text-text-primary"
+                        ? "bg-white/80 dark:bg-white/15 backdrop-blur-md border border-white/60 dark:border-white/20 shadow-sm text-slate-900 dark:text-white font-semibold"
+                        : "text-slate-500 dark:text-text-muted font-medium hover:text-slate-800 dark:hover:text-text-primary hover:bg-white/40 dark:hover:bg-white/10"
                     }`}
                   >
-                    <item.icon size={20} className={`flex-shrink-0 ${!isActive ? "!text-black/50 dark:!text-text-muted group-hover:!text-black dark:group-hover:!text-text-primary" : "!text-white dark:!text-white"}`} />
+                    <item.icon
+                      size={20}
+                      className={`flex-shrink-0 transition-colors ${
+                        isActive
+                          ? "text-slate-900 dark:text-white"
+                          : "text-slate-500 dark:text-text-muted group-hover:text-slate-800 dark:group-hover:text-text-primary"
+                      }`}
+                    />
                     {item.name}
                   </Link>
                 )
