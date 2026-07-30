@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   LayoutDashboard, CheckSquare, AlertCircle,
-  Calendar, Users, BarChart, Building2
+  Calendar, Users, BarChart, Building2, Settings, HelpCircle, LogOut
 } from "lucide-react"
 import { useEffect, useState } from "react"
 import ThemeToggle from "./ThemeToggle"
@@ -51,6 +51,11 @@ export default function PortalShell({
     { name: "Analytics", href: "/portal/analytics", icon: BarChart },
   ]
 
+  const utilityItems = [
+    { name: "Settings", href: "#settings", icon: Settings },
+    { name: "Help & Support", href: "#help", icon: HelpCircle },
+  ]
+
   return (
     <div className="min-h-screen bg-background text-primary transition-colors duration-500 flex relative overflow-hidden font-sans">
       
@@ -61,97 +66,121 @@ export default function PortalShell({
       {/* ─────────────────────────────────────────
           DESKTOP SIDEBAR
       ───────────────────────────────────────── */}
-      <aside className="hidden md:flex flex-col fixed top-0 left-0 h-screen w-64 bg-white dark:bg-bg-page border-r border-black/5 dark:border-border-hairline z-40 flex-shrink-0">
+      <aside className="hidden md:flex flex-col fixed top-0 left-0 h-screen w-64 bg-white dark:bg-bg-page border-r border-black/5 dark:border-border-hairline z-40 flex-shrink-0 justify-between">
 
-        {/* Brand */}
-        <div className="flex items-center gap-3 px-6 py-6 border-b border-black/5 dark:border-border-hairline">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#3b82f6] text-white dark:bg-bg-surface-raised dark:text-accent dark:border dark:border-border-hairline flex-shrink-0">
-            <Building2 size={24} />
+        <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
+          {/* Brand */}
+          <div className="flex items-center gap-3 px-6 py-6 border-b border-black/5 dark:border-border-hairline flex-shrink-0">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white dark:bg-bg-surface-raised dark:text-accent dark:border dark:border-border-hairline flex-shrink-0 shadow-md shadow-indigo-500/20">
+              <Building2 size={24} />
+            </div>
+            <div>
+              <p className="text-lg font-heading font-bold !text-black dark:!text-text-primary leading-tight tracking-wide">Facility Portal</p>
+              <p className="text-sm !text-black/60 dark:!text-text-muted leading-tight">Management Suite</p>
+            </div>
           </div>
-          <div>
-            <p className="text-lg font-heading font-bold !text-black dark:!text-text-primary leading-tight tracking-wide">Facility Portal</p>
-            <p className="text-sm !text-black/60 dark:!text-text-muted leading-tight">Management Suite</p>
-          </div>
-        </div>
 
-        {/* Nav */}
-        <nav className="flex flex-col flex-1 gap-1 px-4 py-6 overflow-y-auto">
+          {/* Nav */}
+          <nav className="flex flex-col flex-1 gap-1 px-4 py-6">
 
-          <p className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider !text-black/50 dark:!text-neutral-400">
-            Main
-          </p>
+            <p className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-neutral-400">
+              Main
+            </p>
 
-          {navItems.map((item) => {
-            const isActive = pathname === item.href
-            return (
+            {navItems.map((item) => {
+              const isActive = pathname === item.href
+              return (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 mx-2 text-base transition-all duration-200 ${
+                    isActive
+                      ? "bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-500 dark:to-blue-500 text-white font-semibold shadow-md shadow-indigo-500/20"
+                      : "text-slate-600 dark:text-text-muted font-medium hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-white/5"
+                  }`}
+                >
+                  <item.icon
+                    size={20}
+                    className={`flex-shrink-0 transition-colors ${
+                      isActive
+                        ? "text-white"
+                        : "text-slate-500 dark:text-text-muted group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+                    }`}
+                  />
+                  <span className={isActive ? "text-white font-semibold" : ""}>
+                    {item.name}
+                  </span>
+                </Link>
+              )
+            })}
+
+            {isAdmin && (
+              <>
+                <p className="mb-2 mt-8 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-neutral-400">
+                  Management
+                </p>
+                {adminItems.map((item) => {
+                  const isActive = pathname === item.href
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 mx-2 text-base transition-all duration-200 ${
+                        isActive
+                          ? "bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-500 dark:to-blue-500 text-white font-semibold shadow-md shadow-indigo-500/20"
+                          : "text-slate-600 dark:text-text-muted font-medium hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-white/5"
+                      }`}
+                    >
+                      <item.icon
+                        size={20}
+                        className={`flex-shrink-0 transition-colors ${
+                          isActive
+                            ? "text-white"
+                            : "text-slate-500 dark:text-text-muted group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+                        }`}
+                      />
+                      <span className={isActive ? "text-white font-semibold" : ""}>
+                        {item.name}
+                      </span>
+                    </Link>
+                  )
+                })}
+              </>
+            )}
+
+            {/* UTILITIES Section */}
+            <p className="mb-2 mt-8 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-neutral-400">
+              Utilities
+            </p>
+            {utilityItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 mx-2 text-base transition-all duration-200 ${
-                  isActive
-                    ? "bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-500 dark:to-blue-500 text-white font-semibold shadow-md shadow-indigo-500/20"
-                    : "text-slate-600 dark:text-text-muted font-medium hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-white/5"
-                }`}
+                className="group flex items-center gap-3 rounded-xl px-4 py-2.5 mx-2 text-base transition-all duration-200 text-slate-600 dark:text-text-muted font-medium hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-white/5"
               >
                 <item.icon
                   size={20}
-                  className={`flex-shrink-0 transition-colors ${
-                    isActive
-                      ? "text-white"
-                      : "text-slate-500 dark:text-text-muted group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
-                  }`}
+                  className="flex-shrink-0 transition-colors text-slate-500 dark:text-text-muted group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
                 />
-                <span className={isActive ? "text-white font-semibold" : ""}>
-                  {item.name}
-                </span>
+                <span>{item.name}</span>
               </Link>
-            )
-          })}
+            ))}
+          </nav>
+        </div>
 
-          {isAdmin && (
-            <>
-              <p className="mb-2 mt-8 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-neutral-400">
-                Management
-              </p>
-              {adminItems.map((item) => {
-                const isActive = pathname === item.href
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 mx-2 text-base transition-all duration-200 ${
-                      isActive
-                        ? "bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-500 dark:to-blue-500 text-white font-semibold shadow-md shadow-indigo-500/20"
-                        : "text-slate-600 dark:text-text-muted font-medium hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-white/5"
-                    }`}
-                  >
-                    <item.icon
-                      size={20}
-                      className={`flex-shrink-0 transition-colors ${
-                        isActive
-                          ? "text-white"
-                          : "text-slate-500 dark:text-text-muted group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
-                      }`}
-                    />
-                    <span className={isActive ? "text-white font-semibold" : ""}>
-                      {item.name}
-                    </span>
-                  </Link>
-                )
-              })}
-            </>
-          )}
-        </nav>
-
-        <div className="p-4">
-          <div className="flex items-center gap-3 rounded-2xl bg-white/50 dark:bg-bg-surface-raised px-3 py-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#3b82f6] dark:bg-bg-surface dark:text-accent text-sm font-bold flex-shrink-0">
-              {initial}
+        {/* Premium User Profile Footer */}
+        <div className="p-4 border-t border-black/5 dark:border-border-hairline flex-shrink-0">
+          <div className="bg-white/60 dark:bg-bg-surface-raised backdrop-blur-md border border-white/50 dark:border-white/10 shadow-sm rounded-2xl p-3 flex items-center justify-between hover:bg-white/80 dark:hover:bg-white/10 transition-all cursor-pointer group">
+            <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-sm flex-shrink-0 shadow-sm">
+                {initial}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-semibold text-slate-800 dark:text-text-primary">{fullName}</p>
+                <p className="truncate text-xs text-slate-500 dark:text-text-muted">{formattedRole}</p>
+              </div>
             </div>
-            <div className="min-w-0 flex-1 pr-2">
-              <p className="truncate text-base font-bold !text-black dark:!text-text-primary">{fullName}</p>
-              <p className="truncate text-xs !text-black/60 dark:!text-text-muted">{formattedRole}</p>
-            </div>
+            <LogOut size={16} className="text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition-colors flex-shrink-0" />
           </div>
         </div>
       </aside>
