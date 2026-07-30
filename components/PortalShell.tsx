@@ -1,12 +1,17 @@
 'use client'
 
-import { useTheme } from "next-themes"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Sun, Moon, LayoutDashboard, CheckSquare, AlertCircle, Calendar, LogOut, Users, BarChart } from "lucide-react"
+import {
+  LayoutDashboard, CheckSquare, AlertCircle,
+  Calendar, Users, BarChart, Building2
+} from "lucide-react"
 import { useEffect, useState } from "react"
+import ThemeToggle from "./ThemeToggle"
 import UserDropdown from "./UserDropdown"
+import NativePushHandler from "./NativePushHandler"
+import OfflineIndicator from "./OfflineIndicator"
 import NotificationPrimer from "./NotificationPrimer"
 
 interface PortalShellProps {
@@ -19,8 +24,15 @@ interface PortalShellProps {
   notificationsEnabled: boolean | null
 }
 
-export default function PortalShell({ children, email, fullName, formattedRole, initial, isAdmin, notificationsEnabled: initialNotificationsEnabled }: PortalShellProps) {
-  const { theme, setTheme } = useTheme()
+export default function PortalShell({
+  children,
+  email,
+  fullName,
+  formattedRole,
+  initial,
+  isAdmin,
+  notificationsEnabled: initialNotificationsEnabled,
+}: PortalShellProps) {
   const [mounted, setMounted] = useState(false)
   const [showPrimer, setShowPrimer] = useState(initialNotificationsEnabled === null)
   const pathname = usePathname()
@@ -39,117 +51,133 @@ export default function PortalShell({ children, email, fullName, formattedRole, 
     { name: "Analytics", href: "/portal/analytics", icon: BarChart },
   ]
 
-  const isCleaner = formattedRole.toLowerCase() === 'housekeeper' || formattedRole.toLowerCase() === 'cleaner'
-
   return (
-    <div className="min-h-screen bg-background text-primary transition-colors duration-300 flex">
+    <div className="min-h-screen bg-background text-primary transition-colors duration-500 flex relative overflow-hidden font-sans">
       
-      {/* DESKTOP SIDEBAR (Hidden on Mobile) */}
-      <aside className="hidden flex-col justify-between md:flex fixed m-4 h-[calc(100vh-2rem)] w-64 xl:w-72 rounded-3xl bg-surface backdrop-blur-xl border border-border shadow-lg shadow-black/5 dark:shadow-xl dark:shadow-black/20 z-40">
-        <nav className="flex flex-col gap-2 p-4 mt-4">
-          <div className="mb-2 px-2 text-xs font-medium uppercase tracking-wider text-muted">Main</div>
+      {/* ── Ambient Radial Blur Background ── */}
+      <div className="fixed -top-[20%] -left-[10%] w-[60vw] h-[60vh] rounded-full bg-accent/10 blur-[140px] pointer-events-none z-0" />
+      <div className="fixed top-[40%] -right-[10%] w-[50vw] h-[50vh] rounded-full bg-accent/5 blur-[140px] pointer-events-none z-0" />
+
+      {/* ─────────────────────────────────────────
+          DESKTOP SIDEBAR
+      ───────────────────────────────────────── */}
+      <aside className="hidden md:flex flex-col fixed top-0 left-0 h-screen w-64 bg-white dark:bg-bg-page border-r border-black/5 dark:border-border-hairline z-40 flex-shrink-0">
+
+        {/* Brand */}
+        <div className="flex items-center gap-3 px-6 py-6 border-b border-black/5 dark:border-border-hairline">
+          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#3b82f6] text-white dark:bg-bg-surface-raised dark:text-accent dark:border dark:border-border-hairline flex-shrink-0">
+            <Building2 size={24} />
+          </div>
+          <div>
+            <p className="text-lg font-heading font-bold !text-black dark:!text-text-primary leading-tight tracking-wide">Facility Portal</p>
+            <p className="text-sm !text-black/60 dark:!text-text-muted leading-tight">Management Suite</p>
+          </div>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex flex-col flex-1 gap-1 px-4 py-6 overflow-y-auto">
+
+          <p className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider !text-black/50 dark:!text-neutral-400">
+            Main
+          </p>
+
           {navItems.map((item) => {
             const isActive = pathname === item.href
             return (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                className={`group flex items-center gap-3 rounded-[10px] px-4 py-2.5 mx-2 text-base font-medium transition-all duration-200 ${
                   isActive
-                    ? "text-accent"
-                    : "text-secondary hover:bg-border/50"
+                    ? "bg-[#3b82f6] dark:bg-bg-surface-raised !text-white dark:!text-text-primary"
+                    : "!text-black/70 dark:!text-text-muted hover:bg-black/5 dark:hover:bg-bg-surface-raised hover:!text-black dark:hover:!text-text-primary"
                 }`}
               >
-                {isActive && (
-                  <motion.div
-                    layoutId="desktop-nav-pill"
-                    className="absolute inset-0 rounded-xl bg-accent/15"
-                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                  />
-                )}
-                <div className="relative z-10 flex items-center gap-3 w-full">
-                  <item.icon size={18} className={isActive ? "text-accent" : ""} />
-                  {item.name}
-                </div>
+                <item.icon size={20} className={`flex-shrink-0 ${!isActive ? "!text-black/50 dark:!text-text-muted group-hover:!text-black dark:group-hover:!text-text-primary" : "!text-white dark:!text-accent"}`} />
+                {item.name}
               </Link>
             )
           })}
 
           {isAdmin && (
             <>
-              <div className="mb-2 mt-6 px-2 text-xs font-medium uppercase tracking-wider text-muted">Management</div>
+              <p className="mb-2 mt-8 px-3 text-xs font-semibold uppercase tracking-wider !text-black/50 dark:!text-neutral-400">
+                Management
+              </p>
               {adminItems.map((item) => {
                 const isActive = pathname === item.href
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                    className={`group flex items-center gap-3 rounded-[10px] px-4 py-2.5 mx-2 text-base font-medium transition-all duration-200 ${
                       isActive
-                        ? "text-accent"
-                        : "text-secondary hover:bg-border/50"
+                        ? "bg-[#3b82f6] dark:bg-bg-surface-raised !text-white dark:!text-text-primary"
+                        : "!text-black/70 dark:!text-text-muted hover:bg-black/5 dark:hover:bg-bg-surface-raised hover:!text-black dark:hover:!text-text-primary"
                     }`}
                   >
-                    {isActive && (
-                      <motion.div
-                        layoutId="desktop-nav-pill"
-                        className="absolute inset-0 rounded-xl bg-accent/15"
-                        transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                      />
-                    )}
-                    <div className="relative z-10 flex items-center gap-3 w-full">
-                      <item.icon size={18} className={isActive ? "text-accent" : ""} />
-                      {item.name}
-                    </div>
+                    <item.icon size={20} className={`flex-shrink-0 ${!isActive ? "!text-black/50 dark:!text-text-muted group-hover:!text-black dark:group-hover:!text-text-primary" : "!text-white dark:!text-accent"}`} />
+                    {item.name}
                   </Link>
                 )
               })}
             </>
           )}
         </nav>
-        
-        <div className="p-4 mb-2">
-          {/* Sign Out moved to UserDropdown in Topbar */}
+
+        <div className="p-4">
+          <div className="flex items-center gap-3 rounded-2xl bg-white/50 dark:bg-bg-surface-raised px-3 py-2">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#3b82f6] dark:bg-bg-surface dark:text-accent text-sm font-bold flex-shrink-0">
+              {initial}
+            </div>
+            <div className="min-w-0 flex-1 pr-2">
+              <p className="truncate text-base font-bold !text-black dark:!text-text-primary">{fullName}</p>
+              <p className="truncate text-xs !text-black/60 dark:!text-text-muted">{formattedRole}</p>
+            </div>
+          </div>
         </div>
       </aside>
 
-      {/* MAIN CONTENT AREA */}
-      <div className="flex-1 flex flex-col md:pl-72 xl:pl-80 w-full min-w-0">
-        
-        {/* TOP HEADER */}
-        <header className="sticky top-[max(env(safe-area-inset-top),16px)] z-50 flex h-16 items-center justify-between mx-4 md:mr-4 md:ml-0 rounded-3xl bg-surface backdrop-blur-xl border border-border shadow-lg shadow-black/5 dark:shadow-xl dark:shadow-black/20 px-6">
-          <div className="flex items-center gap-4">
-            <span className="text-lg font-semibold tracking-tight text-primary">Facility Portal</span>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            {mounted && (
-              <button
-                onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                className="rounded-full p-2 transition-all text-secondary hover:bg-border/50"
-              >
-                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-              </button>
-            )}
-            <UserDropdown 
-              email={email}
-              fullName={fullName}
-              formattedRole={formattedRole}
-              initial={initial}
-              notificationsEnabled={initialNotificationsEnabled === true}
-            />
-          </div>
-        </header>
+      {/* ─────────────────────────────────────────
+          MAIN CONTENT AREA
+      ───────────────────────────────────────── */}
+      <div className="flex-1 flex flex-col md:pl-[260px] w-full min-w-0">
 
-        <main className="flex-1 pb-24 md:pb-8 pt-[calc(env(safe-area-inset-top)+100px)] relative">
+        {/* HEADER BAR — floating pill */}
+        <div className="sticky top-3 z-30 px-4 md:px-8 pointer-events-none">
+          <header className="pointer-events-auto flex h-16 items-center justify-between bg-white/40 dark:bg-white/5 backdrop-blur-3xl border border-white/60 dark:border-white/10 rounded-full px-4 md:px-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none transition-all duration-300">
+            <div className="flex items-center gap-2 md:hidden">
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#3b82f6] text-white dark:bg-[#3b82f6] dark:text-white">
+                <Building2 size={16} />
+              </div>
+              <span className="text-sm font-semibold text-primary">Facility Portal</span>
+            </div>
+
+            <div className="hidden md:block" />
+
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+              <UserDropdown
+                email={email}
+                fullName={fullName}
+                formattedRole={formattedRole}
+                initial={initial}
+                notificationsEnabled={initialNotificationsEnabled === true}
+              />
+            </div>
+          </header>
+        </div>
+
+        {/* PAGE CONTENT */}
+        <main className="flex-1 pb-28 md:pb-12 pt-8 w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.25, ease: "easeInOut" }}
-              className="w-full max-w-[1600px] mx-auto px-6 md:px-10 xl:px-14 2xl:px-16"
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="w-full max-w-[1440px] mx-auto px-5 md:px-10"
             >
               {children}
             </motion.div>
@@ -157,37 +185,33 @@ export default function PortalShell({ children, email, fullName, formattedRole, 
         </main>
       </div>
 
-      {/* MOBILE BOTTOM NAV (Hidden on Desktop) */}
-      <div className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] left-4 right-4 z-50 md:hidden">
-        <nav className="flex items-center justify-around rounded-full border border-border bg-surface p-1.5 backdrop-blur-xl shadow-lg shadow-black/10 dark:shadow-xl dark:shadow-black/20">
+      {/* ─────────────────────────────────────────
+          MOBILE BOTTOM NAV
+      ───────────────────────────────────────── */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white dark:bg-bg-surface border-t border-black/5 dark:border-border-hairline pb-[env(safe-area-inset-bottom)]">
+        <nav className="flex items-center justify-around p-2">
           {navItems.map((item) => {
             const isActive = pathname === item.href
             return (
               <Link
                 key={item.name}
                 href={item.href}
-                className={`relative flex flex-1 flex-col items-center justify-center gap-1 rounded-full py-2.5 transition-colors ${
-                  isActive
-                    ? "text-accent"
-                    : "text-secondary hover:text-primary"
+                className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-2 active:scale-95 transition-all duration-200 ${
+                  isActive ? "text-[#3b82f6] dark:text-accent" : "text-black/50 dark:text-text-muted dark:hover:text-text-primary"
                 }`}
               >
-                {isActive && (
-                  <motion.div
-                    layoutId="mobile-nav-pill"
-                    className="absolute inset-0 rounded-full bg-accent/15 shadow-sm"
-                    transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                  />
-                )}
                 <div className="relative z-10 flex flex-col items-center gap-1">
-                  <item.icon size={20} className={isActive ? "text-accent" : ""} />
-                  <span className="text-[10px] font-bold tracking-wide">{item.name}</span>
+                  <item.icon size={20} />
+                  <span className="text-[10px] font-semibold tracking-wide">{item.name}</span>
                 </div>
               </Link>
             )
           })}
         </nav>
       </div>
+
+      <NativePushHandler />
+      <OfflineIndicator />
 
       {mounted && showPrimer && (
         <NotificationPrimer onDismiss={() => setShowPrimer(false)} />

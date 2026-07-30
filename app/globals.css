@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+/* ─── Light Illustration Theme Tokens ─── */
+:root {
+  /* Ambient Background */
+  --canvas-from: #eef1fa;
+  --canvas-via: #eef1fa;
+  --canvas-to: #eef1fa;
+
+  /* Surfaces */
+  --background: #eef1fa;
+  --surface: #f6f8fd; 
+  --surface-muted: rgba(246, 248, 253, 0.6);
+  --surface-solid: #ffffff;
+  --surface-shadow: rgba(33, 72, 196, 0.08);
+
+  /* Borders */
+  --border: #d7dceb;
+  --border-strong: #2148c4;
+
+  /* Typography */
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+
+  /* Accent */
+  --accent: #2148c4;
+  --accent-hover: #1a3aa0;
+  --accent-foreground: #ffffff;
+
+  /* Status Colors (Lightened slightly for light bg) */
+  --success: #10b981;
+  --success-bg: rgba(16, 185, 129, 0.1);
+  --success-border: rgba(16, 185, 129, 0.2);
+
+  --warning: #f59e0b;
+  --warning-bg: rgba(245, 158, 11, 0.1);
+  --warning-border: rgba(245, 158, 11, 0.2);
+
+  --danger: #ef4444;
+  --danger-bg: rgba(239, 68, 68, 0.1);
+  --danger-border: rgba(239, 68, 68, 0.2);
+
+  --neutral-pill-text: #6b7590;
+  --neutral-pill-bg: #eef1fa;
+  --neutral-pill-border: #d7dceb;
+
+  /* Sidebar */
+  --sidebar-bg: #f6f8fd;
+  --sidebar-text: #1e2a5e;
+  --sidebar-text-muted: #6b7590;
+  --sidebar-border: #d7dceb;
+}
+
+.dark {
+  /* backgrounds */
+  --bg-page: #000000;
+  --bg-surface: #0D0D0F;
+  --bg-surface-raised: #141416;
+
+  /* accent */
+  --accent: #00E5FF;
+  --accent-dim: #0891A8;
+  --accent-on: #00252B;
+
+  /* text */
+  --text-primary: #F5F5F5;
+  --text-muted: #8A8F94;
+
+  /* borders */
+  --border-hairline: rgba(255, 255, 255, 0.08);
+  --border-dashed: rgba(255, 255, 255, 0.15);
+
+  /* Fallback mapped variables */
+  --background: var(--bg-page);
+  --surface: var(--bg-surface);
+  --border: var(--border-hairline);
+  --border-strong: var(--border-dashed);
+
+  /* Status Colors */
+  --success: #34d399;
+  --success-bg: rgba(52, 211, 153, 0.1);
+  --success-border: rgba(52, 211, 153, 0.2);
+  --warning: #fbbf24;
+  --warning-bg: rgba(251, 191, 36, 0.1);
+  --warning-border: rgba(251, 191, 36, 0.2);
+  --danger: #f87171;
+  --danger-bg: rgba(248, 113, 113, 0.1);
+  --danger-border: rgba(248, 113, 113, 0.2);
+}
+
+@theme inline {
+  --color-bg-page: var(--bg-page);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-surface-raised: var(--bg-surface-raised);
+
+  --color-accent: var(--accent);
+  --color-accent-dim: var(--accent-dim);
+  --color-accent-on: var(--accent-on);
+
+  --color-text-primary: var(--text-primary);
+  --color-text-muted: var(--text-muted);
+
+  --color-border-hairline: var(--border-hairline);
+  --color-border-dashed: var(--border-dashed);
+
+  --color-canvas-from: var(--canvas-from);
+  --color-canvas-via: var(--canvas-via);
+  --color-canvas-to: var(--canvas-to);
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-surface-solid: var(--surface-solid);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-muted: var(--text-muted);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-bg: var(--success-bg);
+  --color-success-border: var(--success-border);
+  --color-warning: var(--warning);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-border: var(--warning-border);
+  --color-danger: var(--danger);
+  --color-danger-bg: var(--danger-bg);
+  --color-danger-border: var(--danger-border);
+  --color-neutral-pill-text: var(--neutral-pill-text);
+  --color-neutral-pill-bg: var(--neutral-pill-bg);
+  --color-neutral-pill-border: var(--neutral-pill-border);
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-sidebar-text: var(--sidebar-text);
+  --color-sidebar-text-muted: var(--sidebar-text-muted);
+  --color-sidebar-border: var(--sidebar-border);
+
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body {
+  background-color: #eef1fa;
+  color: #2a3350;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom WebKit scrollbar with glass styling */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }

@@ -1,0 +1,6 @@
+✖ Copying web assets from public to android/app/src/main/assets/public - failed!
+✖ copy android - failed!
+[error] Error: EEXIST: file already exists, mkdir '/Users/inderjeet/Documents/bhaskar-facility-app/android/app/src/main/assets/public'
+✔ Updating Android plugins in 3.11ms
+✔ update android in 4.14s
+[info] Sync finished in 19.957s
