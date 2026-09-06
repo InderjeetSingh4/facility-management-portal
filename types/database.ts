@@ -10,9 +10,9 @@
 // correctly fail to type-check, which is your reminder to regenerate.
 // ----------------------------------------------------------------------------
 
-export type UserRole = 'super_admin' | 'local_admin' | 'cleaner' | 'employee'
+export type UserRole = 'super_admin' | 'system_executive' | 'local_admin' | 'cleaner' | 'housekeeper' | 'employee'
 export type ApprovalStatus = 'pending' | 'approved' | 'rejected'
-export type ComplaintStatus = 'open' | 'pending_approval' | 'approved' | 'rejected'
+export type ComplaintStatus = 'pending' | 'reviewed' | 'resolved' | 'dismissed'
 export type NoticeColorTheme =
   | 'bg-red-500/10 text-red-700'
   | 'bg-blue-500/10 text-blue-700'

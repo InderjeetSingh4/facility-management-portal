@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, type ChangeEvent } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { submitComplaint } from '../actions'
 import { toast } from 'sonner'
@@ -8,6 +9,7 @@ import { Camera } from 'lucide-react'
 
 export default function ComplaintForm() {
   const supabase = createClient()
+  const router = useRouter()
   const formRef = useRef<HTMLFormElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -43,18 +45,24 @@ export default function ComplaintForm() {
       let imageUrl = ''
 
       if (photoFile) {
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) {
-          setError('Session expired. Please sign in again.')
-          setIsSubmitting(false)
+        const { data: { user }, error: userError } = await supabase.auth.getUser()
+        if (userError || !user) {
+          const errMsg = userError?.message || 'Session expired. Please sign in again.'
+          console.error('Auth check error during complaint submission:', userError)
+          setError(errMsg)
+          toast.error(errMsg)
           return
         }
 
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('users')
           .select('plant_id')
           .eq('id', user.id)
-          .single() as { data: any }
+          .single() as { data: any; error: any }
+
+        if (profileError) {
+          console.error('Error fetching plant_id for user during photo upload:', profileError)
+        }
 
         const plantId = profile?.plant_id || 'unknown'
         const fileExt = photoFile.name.split('.').pop()?.toLowerCase() || 'jpg'
@@ -69,8 +77,10 @@ export default function ComplaintForm() {
           })
 
         if (uploadError) {
-          setError('Could not upload the photo. Please try again.')
-          setIsSubmitting(false)
+          console.error('Complaint photo upload error:', uploadError)
+          const errMsg = uploadError.message || 'Could not upload the photo. Please try again.'
+          setError(errMsg)
+          toast.error(errMsg)
           return
         }
 
@@ -82,22 +92,32 @@ export default function ComplaintForm() {
 
       const result = await submitComplaint(formData)
       if (result?.error) {
+        console.error('Complaint submission error from server action:', result.error)
         setError(result.error)
-        toast.error('Failed to submit. Please try again.')
-        setIsSubmitting(false)
+        toast.error(result.error)
       } else {
+        console.log('Complaint submitted successfully:', result)
         toast.success('Complaint submitted successfully!')
+        removePhoto()
+        formRef.current?.reset()
+        setError(null)
+        router.refresh()
       }
-    } catch {
-      // redirect() throws NEXT_REDIRECT — expected
+    } catch (err: any) {
+      console.error('Unexpected error submitting complaint:', err)
+      const errMsg = err?.message || 'An unexpected error occurred. Please try again.'
+      setError(errMsg)
+      toast.error(errMsg)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
-  const inputCls = 'w-full rounded-[10px] border border-transparent bg-black/5 dark:bg-bg-surface-raised px-4 py-3 text-sm text-slate-900 dark:text-text-primary outline-none placeholder:text-slate-400 dark:placeholder:text-text-muted focus:border-dashed focus:border-blue-500 dark:focus:border-accent transition-all'
-  const labelCls = 'mb-1.5 block text-xs font-semibold uppercase tracking-widest text-slate-500 dark:text-text-muted'
+  const inputCls = 'w-full rounded-xl border border-transparent bg-muted px-4 md:px-5 py-3.5 md:py-4 text-base md:text-lg text-foreground outline-none placeholder:text-muted-foreground focus:border-dashed focus:border-primary transition-all'
+  const labelCls = 'mb-2 block text-sm md:text-base font-bold uppercase tracking-wider text-muted-foreground'
 
   return (
-    <form ref={formRef} action={handleSubmit} className="space-y-4">
+    <form ref={formRef} action={handleSubmit} className="space-y-6 md:space-y-7 w-full max-w-3xl mx-auto">
       {/* Title */}
       <div>
         <label htmlFor="complaint-title" className={labelCls}>Title</label>
@@ -124,15 +144,15 @@ export default function ComplaintForm() {
         />
 
         {previewUrl ? (
-          <div className="relative overflow-hidden rounded-[10px] border border-slate-200 dark:border-white/10 shadow-sm">
+          <div className="relative overflow-hidden rounded-xl border border-border shadow-sm">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={previewUrl} alt="Preview" className="h-44 w-full object-cover" />
-            <div className="absolute bottom-3 right-3 flex gap-2">
+            <img src={previewUrl} alt="Preview" className="h-56 sm:h-64 md:h-72 w-full object-cover" />
+            <div className="absolute bottom-4 right-4 flex gap-3">
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isSubmitting}
-                className="rounded-[10px] bg-slate-900/80 dark:bg-white/80 px-4 py-2 text-xs font-semibold text-white dark:text-black hover:opacity-90 transition disabled:opacity-40"
+                className="rounded-xl bg-primary/90 px-5 py-2.5 text-sm md:text-base font-bold text-primary-foreground hover:opacity-100 transition disabled:opacity-40 backdrop-blur-sm shadow-sm"
               >
                 Retake
               </button>
@@ -140,7 +160,7 @@ export default function ComplaintForm() {
                 type="button"
                 onClick={removePhoto}
                 disabled={isSubmitting}
-                className="rounded-[10px] bg-red-500/80 px-4 py-2 text-xs font-semibold text-white hover:bg-red-600 transition disabled:opacity-40"
+                className="rounded-xl bg-danger/90 px-5 py-2.5 text-sm md:text-base font-bold text-white hover:bg-danger transition disabled:opacity-40 backdrop-blur-sm shadow-sm"
               >
                 Remove
               </button>
@@ -151,10 +171,10 @@ export default function ComplaintForm() {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={isSubmitting}
-            className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-[10px] border border-dashed border-black/10 dark:border-white/15 bg-black/5 dark:bg-bg-surface-raised text-slate-500 dark:text-text-muted hover:border-blue-500 dark:hover:border-accent hover:text-blue-500 dark:hover:text-accent transition-all disabled:opacity-40"
+            className="flex h-40 sm:h-48 md:h-56 w-full flex-col items-center justify-center gap-3 rounded-xl border-2 border-dashed border-border bg-muted text-muted-foreground hover:border-primary hover:text-primary transition-all disabled:opacity-40 p-6"
           >
-            <Camera size={24} />
-            <span className="text-xs font-semibold">Tap to add a photo</span>
+            <Camera className="w-7 h-7 sm:w-8 sm:h-8 md:w-9 md:h-9" />
+            <span className="text-sm md:text-base font-bold">Tap to add a photo</span>
           </button>
         )}
       </div>
@@ -167,14 +187,14 @@ export default function ComplaintForm() {
           name="description"
           required
           placeholder="Describe the issue in detail..."
-          rows={3}
-          className={`${inputCls} resize-none`}
+          rows={5}
+          className={`${inputCls} min-h-[140px] md:min-h-[160px] resize-none`}
         />
       </div>
 
       {/* Error */}
       {error && (
-        <div className="rounded-[10px] border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-500">
+        <div className="rounded-xl border border-danger-border bg-danger-bg px-5 py-4 text-base text-danger font-medium">
           {error}
         </div>
       )}
@@ -183,10 +203,11 @@ export default function ComplaintForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white focus:ring-2 focus:ring-indigo-500/40 font-bold py-3.5 px-4 rounded-xl transition-all shadow-md shadow-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full bg-primary hover:opacity-90 border border-border text-primary-foreground transition-all rounded-xl py-3 px-6 font-medium shadow-sm disabled:cursor-not-allowed disabled:opacity-50 tracking-wide"
       >
         {isSubmitting ? 'Submitting…' : 'Submit Complaint'}
       </button>
     </form>
   )
 }
+

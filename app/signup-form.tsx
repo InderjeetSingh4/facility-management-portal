@@ -1,227 +1,182 @@
 'use client'
 
-import { useActionState, useState, useEffect } from 'react'
+import { useActionState, useState } from 'react'
 import { signUpUser } from '@/app/auth/actions'
 import Link from 'next/link'
-import { motion, AnimatePresence, Variants } from 'framer-motion'
-import { Eye, EyeOff, Loader2 } from 'lucide-react'
+import { EyeOff, Loader2, Square } from 'lucide-react'
 import AuthIllustration from '@/components/AuthIllustration'
-import AuthBackground from '@/components/AuthBackground'
 
 const initialState = { error: '' }
 
 type Plant = { id: string; name: string }
 
-const containerVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.97, y: 15 },
-  visible: { 
-    opacity: 1, 
-    scale: 1,
-    y: 0, 
-    transition: { 
-      duration: 0.4,
-      ease: [0.16, 1, 0.3, 1]
-    }
-  }
-}
-
 export default function SignUpForm({ plants }: { plants: Plant[] }) {
   const [state, formAction, isPending] = useActionState(signUpUser, initialState)
   const [showPassword, setShowPassword] = useState(false)
-  const [shake, setShake] = useState(false)
-
-  // Trigger shake animation on form error
-  useEffect(() => {
-    if (state?.error) {
-      setShake(true)
-      const t = setTimeout(() => setShake(false), 400)
-      return () => clearTimeout(t)
-    }
-  }, [state?.error])
 
   return (
-    <motion.div 
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-      className="w-full max-w-[1220px] rounded-[22px] border-[3px] border-[#2148c4] dark:border-transparent bg-[#f6f8fd] dark:bg-bg-surface overflow-hidden shadow-[0_40px_100px_rgba(33,72,196,0.18)] dark:shadow-none grid grid-cols-1 md:grid-cols-12 min-h-[760px]"
-    >
+    <div className="w-full max-w-4xl min-h-[600px] rounded-[2rem] overflow-hidden shadow-[0_40px_80px_-20px_rgba(0,0,0,0.1)] grid grid-cols-1 md:grid-cols-2 bg-card">
       {/* ─────────────────────────────────────────
-          LEFT COLUMN — Form (~34%)
+          LEFT COLUMN — The Form (White Background)
       ───────────────────────────────────────── */}
-      <motion.div 
-        animate={shake ? { x: [-8, 8, -6, 6, -3, 3, 0] } : {}}
-        transition={{ duration: 0.4 }}
-        className="md:col-span-4 p-[40px] lg:pt-[60px] lg:pr-[70px] lg:pb-[60px] lg:pl-[60px] flex flex-col relative overflow-hidden"
-      >
-        {/* Decorative Background Layer */}
-        <AuthBackground />
+      <div className="relative flex flex-col justify-center p-12 sm:p-16 overflow-hidden shadow-[10px_0_40px_rgba(0,0,0,0.04)] border-r border-white/60 z-20 bg-[#F8FAFC]">
+        
+        {/* Ambient Gradient Mesh (Underneath) */}
+        <div className="absolute top-[-15%] left-[-15%] w-[450px] h-[450px] bg-gradient-to-br from-blue-100/50 to-slate-200/40 rounded-full blur-[90px] z-0 pointer-events-none"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] bg-gradient-to-tl from-slate-300/30 to-blue-50/50 rounded-full blur-[110px] z-0 pointer-events-none"></div>
+        <div className="absolute top-[35%] left-[25%] w-[350px] h-[350px] bg-gradient-to-tr from-indigo-100/20 to-transparent rounded-full blur-[70px] z-0 pointer-events-none"></div>
+        
+        {/* Frosted Glass Overlay */}
+        <div className="absolute inset-0 z-0 bg-white/40 backdrop-blur-[50px] pointer-events-none"></div>
 
-        {/* Brand */}
-        <div className="text-[15px] font-[800] tracking-[0.08em] text-[#1e2a5e] dark:text-accent mb-[60px] relative z-10">
-          FACILITY PORTAL
-        </div>
+        {/* Delicate Inner Highlight */}
+        <div className="absolute inset-0 z-0 border-[1.5px] border-white/70 pointer-events-none mix-blend-overlay"></div>
 
-        {/* Abstract Disc Element overlapping form area */}
-        <div className="absolute top-[46px] left-[260px] pointer-events-none hidden lg:block z-0">
-          <svg width="90" height="90" viewBox="0 0 90 90">
-            <ellipse cx="45" cy="78" rx="26" ry="6" fill="#c7d2ee"/>
-            <g transform="rotate(-18 45 40)">
-              <ellipse cx="45" cy="40" rx="30" ry="30" fill="#5b7ce0"/>
-              <path d="M45 40 L45 12 A28 28 0 0 1 66 52 Z" fill="#8ea4ea"/>
-              <ellipse cx="45" cy="40" rx="30" ry="10" fill="#4a68d0" opacity="0.35"/>
-            </g>
-          </svg>
-        </div>
-
-        {/* Headline & Subcopy */}
-        <div className="relative z-10">
-          <h1 className="text-[40px] font-[800] text-[#1e2a5e] dark:text-text-primary mb-[10px] leading-tight">
-            Sign Up
-          </h1>
-          <p className="text-[13px] text-[#9aa3b8] dark:text-text-muted leading-[1.5] max-w-[260px] mb-[36px]">
-            Fill in your details to start managing facility operations.
-          </p>
+        {/* Content Wrapper */}
+        <div className="relative z-10 flex flex-col w-full h-full justify-center">
+          
+          {/* Header Section */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <svg width="16" height="16" viewBox="0 0 48 48" className="drop-shadow-sm">
+                <defs>
+                  <radialGradient id="smallSphereGradSignup" cx="30%" cy="30%" r="70%">
+                    <stop offset="0%" stopColor="#888888" />
+                    <stop offset="100%" stopColor="#111111" />
+                  </radialGradient>
+                </defs>
+                <circle cx="24" cy="24" r="24" fill="url(#smallSphereGradSignup)" />
+              </svg>
+              <p className="text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase m-0">
+                FACILITYOS
+              </p>
+            </div>
+            <h1 className="text-4xl font-sans font-semibold text-foreground mb-2">
+              Sign Up
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Fill in your details to start managing facility operations.
+            </p>
+          </div>
 
           {/* Form */}
-          <form action={formAction} className="space-y-[20px]">
+          <form action={formAction} className="flex flex-col gap-4 w-full">
             
             {/* Full Name Field */}
-            <div className="max-w-[260px] group relative">
-              <label className="block text-[13px] text-[#6b7590] dark:text-text-muted mb-[6px] transition-colors group-focus-within:text-[#2148c4] dark:group-focus-within:text-accent">
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                 Full Name
               </label>
-              <div className="relative border border-transparent bg-black/5 dark:bg-bg-surface-raised rounded-[10px] p-4 focus-within:border-[#2148c4] focus-within:border-dashed dark:focus-within:border-accent transition-colors">
-                <input
-                  name="full_name"
-                  type="text"
-                  required
-                  disabled={isPending}
-                  placeholder="John Doe"
-                  className="w-full bg-transparent text-[14px] text-[#2a3350] dark:text-text-primary outline-none placeholder-[#b7bfd4] dark:placeholder:text-text-muted disabled:opacity-50"
-                />
-              </div>
+              <input
+                name="full_name"
+                type="text"
+                required
+                disabled={isPending}
+                placeholder="John Doe"
+                className="w-full bg-white/60 border border-slate-200 shadow-[0_2px_12px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-md rounded-xl px-4 py-3 text-foreground outline-none placeholder:text-muted-foreground focus:bg-white focus:border-slate-300 focus:shadow-[0_4px_16px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,1)] transition-all disabled:opacity-50"
+              />
             </div>
 
             {/* Email Field */}
-            <div className="max-w-[260px] group relative">
-              <label className="block text-[13px] text-[#6b7590] dark:text-text-muted mb-[6px] transition-colors group-focus-within:text-[#2148c4] dark:group-focus-within:text-accent">
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                 Email
               </label>
-              <div className="relative border border-transparent bg-black/5 dark:bg-bg-surface-raised rounded-[10px] p-4 focus-within:border-[#2148c4] focus-within:border-dashed dark:focus-within:border-accent transition-colors">
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  disabled={isPending}
-                  placeholder="admin@facilityportal.com"
-                  className="w-full bg-transparent text-[14px] text-[#2a3350] dark:text-text-primary outline-none placeholder-[#b7bfd4] dark:placeholder:text-text-muted disabled:opacity-50"
-                />
-              </div>
+              <input
+                name="email"
+                type="email"
+                required
+                disabled={isPending}
+                placeholder="admin@facilityos.com"
+                className="w-full bg-white/60 border border-slate-200 shadow-[0_2px_12px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-md rounded-xl px-4 py-3 text-foreground outline-none placeholder:text-muted-foreground focus:bg-white focus:border-slate-300 focus:shadow-[0_4px_16px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,1)] transition-all disabled:opacity-50"
+              />
             </div>
 
-            {/* Password Field with Eye Icon */}
-            <div className="max-w-[260px] group relative">
-              <label className="block text-[13px] text-[#6b7590] dark:text-text-muted mb-[6px] transition-colors group-focus-within:text-[#2148c4] dark:group-focus-within:text-accent">
+            {/* Password Field */}
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                 Password
               </label>
-              <div className="relative border border-transparent bg-black/5 dark:bg-bg-surface-raised rounded-[10px] p-4 focus-within:border-[#2148c4] focus-within:border-dashed dark:focus-within:border-accent transition-colors flex items-center">
+              <div className="relative">
                 <input
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   required
                   disabled={isPending}
-                  placeholder="Please enter your password"
-                  className="w-full pr-[24px] bg-transparent text-[14px] text-[#2a3350] dark:text-text-primary outline-none placeholder-[#b7bfd4] dark:placeholder:text-text-muted disabled:opacity-50"
+                  placeholder="••••••••••••"
+                  className="w-full bg-white/60 border border-slate-200 shadow-[0_2px_12px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-md rounded-xl pl-4 pr-12 py-3 text-foreground outline-none placeholder:text-muted-foreground focus:bg-white focus:border-slate-300 focus:shadow-[0_4px_16px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,1)] transition-all disabled:opacity-50"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 text-[#9aa3b8] dark:text-text-muted hover:text-[#6b7590] dark:hover:text-text-primary transition-colors"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  className="absolute inset-y-0 right-4 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? <EyeOff size={18} /> : <Square size={18} strokeWidth={2.5} />}
                 </button>
               </div>
             </div>
 
             {/* Account Role Field */}
-            <div className="max-w-[260px] group relative">
-              <label className="block text-[13px] text-[#6b7590] dark:text-text-muted mb-[6px] transition-colors group-focus-within:text-[#2148c4] dark:group-focus-within:text-accent">
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground mb-1.5">
                 Account Role
               </label>
-              <div className="relative border border-transparent bg-black/5 dark:bg-bg-surface-raised rounded-[10px] p-4 focus-within:border-dashed focus-within:border-[#2148c4] dark:focus-within:border-accent transition-colors flex items-center">
+              <div className="relative">
                 <select
                   name="role"
                   required
                   disabled={isPending}
                   defaultValue=""
-                  className="w-full border-none bg-transparent pr-[24px] text-[14px] text-[#2a3350] dark:text-text-primary outline-none cursor-pointer disabled:opacity-50 appearance-none transition-colors"
+                  className="w-full bg-white/60 border border-slate-200 shadow-[0_2px_12px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-md rounded-xl px-4 py-3 pr-10 text-foreground outline-none transition-all focus:bg-white focus:border-slate-300 focus:shadow-[0_4px_16px_rgba(0,0,0,0.06),inset_0_1px_0_rgba(255,255,255,1)] disabled:opacity-50 appearance-none cursor-pointer"
                   style={{
                     backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%239aa3b8\' stroke-width=\'2\'%3E%3Cpath d=\'M6 9l6 6 6-6\'/%3E%3C/svg%3E")',
                     backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'right 0 center',
+                    backgroundPosition: 'right 12px center',
                     backgroundSize: '16px'
                   }}
                 >
-                  <option value="" disabled className="text-[#9aa3b8] dark:bg-bg-surface">Select a role...</option>
-                  <option value="cleaner" className="text-[#2a3350] dark:bg-bg-surface dark:text-text-primary">Housekeeper (Staff)</option>
-                  <option value="local_admin" className="text-[#2a3350] dark:bg-bg-surface dark:text-text-primary">Facility Manager (Admin)</option>
-                  <option value="super_admin" className="text-[#2a3350] dark:bg-bg-surface dark:text-text-primary">System Executive</option>
+                  <option value="" disabled className="text-muted-foreground">Select a role...</option>
+                  <option value="housekeeper" className="text-foreground bg-white">Housekeeper / Facility Staff</option>
+                  <option value="employee" className="text-foreground bg-white">Company Employee / Occupant</option>
                 </select>
               </div>
             </div>
 
             {/* Error Message Alert */}
-            <AnimatePresence>
-              {state?.error && (
-                <motion.div 
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="overflow-hidden max-w-[260px]"
-                >
-                  <div className="rounded-md border border-red-200 bg-red-50 px-3.5 py-2.5 text-[12px] font-semibold text-red-700 mt-2">
-                    {state.error}
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {state?.error && (
+              <div className="rounded-xl border border-danger-border bg-danger-bg px-4 py-3 text-sm font-medium text-danger">
+                {state.error}
+              </div>
+            )}
 
-            {/* Primary Action Button */}
-            <div className="pt-[10px]">
-              <button
-                type="submit"
-                disabled={isPending}
-                className="flex items-center justify-center gap-2 w-[150px] bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white focus:ring-2 focus:ring-indigo-500/40 rounded-[10px] py-[13px] text-[12px] font-[700] tracking-[0.08em] active:scale-[0.98] transition-all duration-150 disabled:opacity-70 disabled:cursor-not-allowed shadow-md shadow-indigo-500/20"
-              >
-                {isPending ? (
-                  <>
-                    <Loader2 size={16} className="animate-spin" />
-                  </>
-                ) : (
-                  'SIGN UP'
-                )}
-              </button>
-            </div>
+            {/* Action Button */}
+            <button
+              type="submit"
+              disabled={isPending}
+              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium rounded-xl py-3 mt-1 hover:scale-[1.02] active:scale-[0.98] transition-transform shadow-lg flex items-center justify-center disabled:opacity-70 disabled:cursor-not-allowed"
+            >
+              {isPending ? <Loader2 size={18} className="animate-spin" /> : 'SIGN UP'}
+            </button>
           </form>
 
-          {/* Footer Navigation Link */}
-          <div className="mt-[18px] text-[13px] text-[#9aa3b8] dark:text-text-muted">
+          {/* Footer */}
+          <div className="mt-8 text-sm text-muted-foreground">
             Already have an account?{' '}
-            <Link href="/login" className="font-[700] text-[#2148c4] dark:text-accent hover:underline transition-all">
+            <Link href="/login" className="font-bold text-foreground hover:underline">
               Sign in
             </Link>
           </div>
         </div>
-      </motion.div>
+      </div>
 
       {/* ─────────────────────────────────────────
-          RIGHT COLUMN — Illustration (~66%)
+          RIGHT COLUMN — The Visual (Dark Background)
       ───────────────────────────────────────── */}
-      <div className="hidden md:block md:col-span-8 relative bg-transparent">
+      <div className="hidden md:flex items-center justify-center relative bg-muted overflow-hidden">
+        
         <AuthIllustration />
+        
       </div>
-    </motion.div>
+    </div>
   )
 }

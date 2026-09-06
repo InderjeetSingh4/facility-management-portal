@@ -4,16 +4,26 @@ import Image from 'next/image'
 import { Suspense } from 'react'
 import PageHeader from '@/components/PageHeader'
 import { approveUser, rejectUser } from '../actions'
+import { isSystemExecutive, isAdmin as checkIsAdmin, canApproveStaff } from '@/lib/auth/rbac'
 
 const ROLE_BADGE: Record<string, string> = {
   super_admin: 'Super Admin',
+  system_executive: 'System Executive',
   local_admin: 'Facility Manager',
   housekeeper: 'Housekeeper',
   cleaner:     'Cleaner',
   employee:    'Staff Member',
 }
 
-async function StaffContent({ plantId, isSuperAdmin }: { plantId: string; isSuperAdmin: boolean }) {
+async function StaffContent({
+  plantId,
+  isSuperAdmin,
+  canApprove,
+}: {
+  plantId: string
+  isSuperAdmin: boolean
+  canApprove: boolean
+}) {
   const supabase = await createClient()
   const todayDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date())
 
@@ -48,49 +58,51 @@ async function StaffContent({ plantId, isSuperAdmin }: { plantId: string; isSupe
   const pendingList = (pendingApprovals || []).filter((u: any) => isSuperAdmin || u.plant_id === plantId)
 
   const housekeepers = staffList.filter((m: any) => m.role === 'cleaner' || m.role === 'employee' || m.role === 'housekeeper')
-  const management = staffList.filter((m: any) => m.role === 'local_admin' || m.role === 'super_admin')
+  const management = staffList.filter((m: any) => m.role === 'local_admin' || m.role === 'super_admin' || m.role === 'system_executive')
   const onDutyCount = housekeepers.filter((m: any) => onDutyUserIds.has(m.id)).length
   const dutyPercentage = housekeepers.length > 0 ? Math.round((onDutyCount / housekeepers.length) * 100) : 0
 
   return (
-    <div className="flex flex-col gap-8 w-full max-w-[1400px] mx-auto text-slate-900 dark:text-white">
+    <div className="flex flex-col gap-6 w-full text-foreground">
       
       {/* ── WIDGET 1: Quick Stats Summary Cards ───────────────────────────── */}
       <div>
-        <p className="text-xs font-bold text-slate-900 dark:text-slate-200 tracking-wider uppercase mb-3">
+        <p className="text-xs font-bold text-foreground tracking-wider uppercase mb-3">
           Overview & Metrics
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           
-          <div className="bg-white dark:bg-bg-surface border border-slate-200 dark:border-white/10 shadow-sm rounded-2xl p-5 hover:border-slate-300 dark:hover:border-white/20 transition-all duration-200">
-            <p className="text-xs font-bold text-slate-900 dark:text-slate-300 uppercase tracking-wider mb-2">Total Facility Staff</p>
+          <div className="bg-card border border-border shadow-sm rounded-2xl p-5 hover:border-primary/50 transition-all duration-200">
+            <p className="text-xs font-bold text-foreground uppercase tracking-wider mb-2">Total Facility Staff</p>
             <div className="flex items-baseline justify-between">
-              <span className="text-3xl font-extrabold text-slate-900 dark:text-white font-mono tracking-tight">{staffList.length}</span>
-              <span className="bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-slate-200 border border-slate-200 dark:border-white/10 rounded-lg px-2.5 py-1 text-xs font-bold">Active</span>
+              <span className="text-3xl font-extrabold text-foreground font-mono tracking-tight">{staffList.length}</span>
+              <span className="bg-primary/10 text-primary border border-primary/20 dark:bg-badge-bg dark:text-badge-text dark:border-badge-border rounded-full px-3 py-1 text-xs font-bold">Active</span>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-bg-surface border border-slate-200 dark:border-white/10 shadow-sm rounded-2xl p-5 hover:border-slate-300 dark:hover:border-white/20 transition-all duration-200">
-            <p className="text-xs font-bold text-slate-900 dark:text-slate-300 uppercase tracking-wider mb-2">Housekeeping On Duty</p>
+          <div className="bg-card border border-border shadow-sm rounded-2xl p-5 hover:border-primary/50 transition-all duration-200">
+            <p className="text-xs font-bold text-foreground uppercase tracking-wider mb-2">Housekeeping On Duty</p>
             <div className="flex items-baseline justify-between">
-              <span className="text-3xl font-extrabold text-slate-900 dark:text-white font-mono tracking-tight">{onDutyCount}</span>
-              <span className="bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-slate-200 border border-slate-200 dark:border-white/10 rounded-lg px-2.5 py-1 text-xs font-bold">Of {housekeepers.length}</span>
+              <span className="text-3xl font-extrabold text-foreground font-mono tracking-tight">{onDutyCount}</span>
+              <span className="bg-primary/10 text-primary border border-primary/20 dark:bg-badge-bg dark:text-badge-text dark:border-badge-border rounded-full px-3 py-1 text-xs font-bold">Of {housekeepers.length}</span>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-bg-surface border border-slate-200 dark:border-white/10 shadow-sm rounded-2xl p-5 hover:border-slate-300 dark:hover:border-white/20 transition-all duration-200">
-            <p className="text-xs font-bold text-slate-900 dark:text-slate-300 uppercase tracking-wider mb-2">Shift Coverage</p>
+          <div className="bg-card border border-border shadow-sm rounded-2xl p-5 hover:border-primary/50 transition-all duration-200">
+            <p className="text-xs font-bold text-foreground uppercase tracking-wider mb-2">Shift Coverage</p>
             <div className="flex items-baseline justify-between">
-              <span className="text-3xl font-extrabold text-slate-900 dark:text-white font-mono tracking-tight">{dutyPercentage}%</span>
-              <span className="bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-slate-200 border border-slate-200 dark:border-white/10 rounded-lg px-2.5 py-1 text-xs font-bold">Live</span>
+              <span className="text-3xl font-extrabold text-foreground font-mono tracking-tight">{dutyPercentage}%</span>
+              <span className="bg-primary/10 text-primary border border-primary/20 dark:bg-badge-bg dark:text-badge-text dark:border-badge-border rounded-full px-3 py-1 text-xs font-bold">Live</span>
             </div>
           </div>
 
-          <div className="bg-white dark:bg-bg-surface border border-slate-200 dark:border-white/10 shadow-sm rounded-2xl p-5 hover:border-slate-300 dark:hover:border-white/20 transition-all duration-200">
-            <p className="text-xs font-bold text-slate-900 dark:text-slate-300 uppercase tracking-wider mb-2">Pending Approvals</p>
+          <div className="bg-card border border-border shadow-sm rounded-2xl p-5 hover:border-primary/50 transition-all duration-200">
+            <p className="text-xs font-bold text-foreground uppercase tracking-wider mb-2">Pending Approvals</p>
             <div className="flex items-baseline justify-between">
-              <span className="text-3xl font-extrabold text-slate-900 dark:text-white font-mono tracking-tight">{pendingList.length}</span>
-              <span className="bg-slate-100 dark:bg-white/10 text-slate-900 dark:text-slate-200 border border-slate-200 dark:border-white/10 rounded-lg px-2.5 py-1 text-xs font-bold">Action Needed</span>
+              <span className="text-3xl font-extrabold text-foreground font-mono tracking-tight">{pendingList.length}</span>
+              <span className="bg-primary/10 text-primary border border-primary/20 dark:bg-badge-bg dark:text-badge-text dark:border-badge-border rounded-full px-3 py-1 text-xs font-bold">
+                {canApprove ? 'Action Needed' : 'Pending'}
+              </span>
             </div>
           </div>
 
@@ -100,11 +112,11 @@ async function StaffContent({ plantId, isSuperAdmin }: { plantId: string; isSupe
       {/* ── WIDGET 2: Pending Member Approvals Table ─────────────────────── */}
       {pendingList.length > 0 && (
         <div>
-          <p className="text-xs font-bold text-slate-900 dark:text-slate-200 tracking-wider uppercase mb-3">
+          <p className="text-xs font-bold text-foreground tracking-wider uppercase mb-3">
             Pending Registration Approvals ({pendingList.length})
           </p>
-          <div className="bg-white dark:bg-bg-surface border border-slate-200 dark:border-white/10 shadow-sm rounded-2xl p-6">
-            <div className="flex flex-col divide-y divide-slate-100 dark:divide-white/10">
+          <div className="bg-card border border-border shadow-sm rounded-2xl p-6">
+            <div className="flex flex-col divide-y divide-border">
               {pendingList.map((member: any) => {
                 const roleName = ROLE_BADGE[member.role] || member.role || 'Staff'
                 const initials = (member.full_name || '?')
@@ -117,40 +129,46 @@ async function StaffContent({ plantId, isSuperAdmin }: { plantId: string; isSupe
                 return (
                   <div key={member.id} className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
-                      <div className="h-11 w-11 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-sm flex items-center justify-center flex-shrink-0 shadow-sm">
+                      <div className="h-11 w-11 rounded-xl bg-primary dark:bg-transparent dark:bg-[image:var(--avatar-bg)] text-primary-foreground dark:text-foreground font-bold text-sm flex items-center justify-center flex-shrink-0 shadow-sm">
                         {initials}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="text-base font-bold text-slate-900 dark:text-white">{member.full_name}</h4>
-                          <span className="bg-slate-100 text-slate-900 dark:bg-white/10 dark:text-slate-200 border border-slate-200 dark:border-white/10 rounded-md px-2.5 py-0.5 text-xs font-bold">
+                          <h4 className="text-base font-bold text-foreground">{member.full_name}</h4>
+                          <span className="bg-primary/10 text-primary border border-primary/20 dark:bg-badge-bg dark:text-badge-text dark:border-badge-border rounded-full px-3 py-0.5 text-xs font-bold">
                             {roleName}
                           </span>
                         </div>
-                        <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 mt-0.5">
+                        <p className="text-xs font-semibold text-muted-foreground mt-0.5">
                           Applied on {new Date(member.created_at).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
-                      <form action={rejectUser.bind(null, member.id)}>
-                        <button
-                          type="submit"
-                          className="bg-slate-100 text-slate-800 hover:text-slate-900 hover:bg-slate-200 dark:bg-white/10 dark:text-slate-200 dark:hover:text-white dark:hover:bg-white/20 border border-slate-200 dark:border-white/10 font-bold py-2 px-4 rounded-xl text-xs transition-all"
-                        >
-                          Reject
-                        </button>
-                      </form>
-                      <form action={approveUser.bind(null, member.id)}>
-                        <button
-                          type="submit"
-                          className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white hover:from-indigo-700 hover:to-blue-700 font-bold py-2 px-4 rounded-xl text-xs transition-all shadow-sm"
-                        >
-                          Approve Staff
-                        </button>
-                      </form>
-                    </div>
+                    {canApprove ? (
+                      <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                        <form action={rejectUser.bind(null, member.id)}>
+                          <button
+                            type="submit"
+                            className="bg-muted text-muted-foreground hover:bg-muted/80 hover:text-foreground border border-border font-bold py-2 px-4 rounded-xl text-xs transition-all"
+                          >
+                            Reject
+                          </button>
+                        </form>
+                        <form action={approveUser.bind(null, member.id)}>
+                          <button
+                            type="submit"
+                            className="bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary/40 dark:bg-[image:var(--accent-gradient)] dark:shadow-[0_0_12px_var(--accent-glow)] font-bold py-2 px-4 rounded-xl text-xs transition-all shadow-sm"
+                          >
+                            Approve Staff
+                          </button>
+                        </form>
+                      </div>
+                    ) : (
+                      <span className="text-xs font-mono font-semibold px-3 py-1 bg-muted rounded-full text-muted-foreground">
+                        Awaiting Manager Action
+                      </span>
+                    )}
                   </div>
                 )
               })}
@@ -162,18 +180,18 @@ async function StaffContent({ plantId, isSuperAdmin }: { plantId: string; isSupe
       {/* ── WIDGET 3: Housekeeping Staff Roster Data Table ───────────────── */}
       <div>
         <div className="flex items-center justify-between mb-3">
-          <p className="text-xs font-bold text-slate-900 dark:text-slate-200 tracking-wider uppercase">
+          <p className="text-xs font-bold text-foreground tracking-wider uppercase">
             Housekeeping Staff ({housekeepers.length})
           </p>
-          <span className="text-xs font-bold text-slate-900 dark:text-slate-200">
+          <span className="text-xs font-bold text-foreground">
             {onDutyCount} On Duty
           </span>
         </div>
 
-        <div className="bg-white dark:bg-bg-surface border border-slate-200 dark:border-white/10 shadow-sm rounded-2xl p-2 md:p-4">
+        <div className="bg-card border border-border shadow-sm rounded-2xl p-2 md:p-4">
           {housekeepers.length === 0 ? (
             <div className="py-12 text-center">
-              <p className="text-sm font-bold text-slate-900 dark:text-slate-300">No housekeeping staff members found.</p>
+              <p className="text-sm font-bold text-foreground">No housekeeping staff members found.</p>
             </div>
           ) : (
             <div className="flex flex-col gap-1">
@@ -188,7 +206,7 @@ async function StaffContent({ plantId, isSuperAdmin }: { plantId: string; isSupe
                 const isOnDuty = onDutyUserIds.has(member.id)
 
                 return (
-                  <div key={member.id} className="p-3.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all duration-200 flex items-center justify-between gap-4">
+                  <div key={member.id} className="p-3.5 rounded-xl hover:bg-muted transition-all duration-200 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4 min-w-0">
                       {member.avatar_url ? (
                         <Image
@@ -196,22 +214,22 @@ async function StaffContent({ plantId, isSuperAdmin }: { plantId: string; isSupe
                           alt={member.full_name}
                           width={44}
                           height={44}
-                          className="h-11 w-11 flex-shrink-0 rounded-xl object-cover border border-slate-200 dark:border-white/10 shadow-sm"
+                          className="h-11 w-11 flex-shrink-0 rounded-xl object-cover border border-border shadow-sm"
                         />
                       ) : (
-                        <div className="h-11 w-11 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-sm flex items-center justify-center flex-shrink-0 shadow-sm">
+                        <div className="h-11 w-11 rounded-xl bg-primary dark:bg-transparent dark:bg-[image:var(--avatar-bg)] text-primary-foreground dark:text-foreground font-bold text-sm flex items-center justify-center flex-shrink-0 shadow-sm">
                           {initials}
                         </div>
                       )}
 
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                          <h4 className="text-base font-bold text-slate-900 dark:text-white truncate">{member.full_name}</h4>
-                          <span className="bg-slate-100 text-slate-900 dark:bg-white/10 dark:text-slate-200 border border-slate-200 dark:border-white/10 rounded-md px-2.5 py-0.5 text-xs font-bold flex-shrink-0">
+                          <h4 className="text-base font-bold text-foreground truncate">{member.full_name}</h4>
+                          <span className="bg-primary/10 text-primary border border-primary/20 dark:bg-badge-bg dark:text-badge-text dark:border-badge-border rounded-full px-3 py-0.5 text-xs font-bold flex-shrink-0">
                             {roleName}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 truncate font-semibold">
+                        <p className="text-xs text-muted-foreground mt-0.5 truncate font-semibold">
                           {[member.designation, member.phone].filter(Boolean).join(' · ') || 'Staff Member'}
                         </p>
                       </div>
@@ -219,13 +237,13 @@ async function StaffContent({ plantId, isSuperAdmin }: { plantId: string; isSupe
 
                     <div className="flex-shrink-0">
                       {isOnDuty ? (
-                        <span className="bg-emerald-50 dark:bg-emerald-950/40 text-emerald-900 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50 rounded-lg px-3 py-1 text-xs font-bold flex items-center gap-2">
-                          <span className="h-2 w-2 rounded-full bg-emerald-600 dark:bg-emerald-400 animate-pulse" />
+                        <span className="bg-success-bg text-success border border-success-border rounded-lg px-3 py-1 text-xs font-bold flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-success animate-pulse" />
                           On Duty
                         </span>
                       ) : (
-                        <span className="bg-slate-100 dark:bg-slate-800/60 text-slate-700 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1 text-xs font-semibold flex items-center gap-2">
-                          <span className="h-2 w-2 rounded-full bg-slate-400 dark:bg-slate-600" />
+                        <span className="bg-muted text-muted-foreground border border-border rounded-lg px-3 py-1 text-xs font-semibold flex items-center gap-2">
+                          <span className="h-2 w-2 rounded-full bg-muted-foreground" />
                           Off Duty
                         </span>
                       )}
@@ -241,10 +259,10 @@ async function StaffContent({ plantId, isSuperAdmin }: { plantId: string; isSupe
       {/* ── WIDGET 4: Management Staff Table ─────────────────────────────── */}
       {management.length > 0 && (
         <div>
-          <p className="text-xs font-bold text-slate-900 dark:text-slate-200 tracking-wider uppercase mb-3">
+          <p className="text-xs font-bold text-foreground tracking-wider uppercase mb-3">
             Facility Executive Management ({management.length})
           </p>
-          <div className="bg-white dark:bg-bg-surface border border-slate-200 dark:border-white/10 shadow-sm rounded-2xl p-2 md:p-4">
+          <div className="bg-card border border-border shadow-sm rounded-2xl p-2 md:p-4">
             <div className="flex flex-col gap-1">
               {management.map((member: any) => {
                 const roleName = ROLE_BADGE[member.role] || 'Manager'
@@ -256,17 +274,17 @@ async function StaffContent({ plantId, isSuperAdmin }: { plantId: string; isSupe
                   .slice(0, 2)
 
                 return (
-                  <div key={member.id} className="p-3.5 rounded-xl hover:bg-slate-50 dark:hover:bg-white/5 transition-all duration-200 flex items-center justify-between gap-4">
+                  <div key={member.id} className="p-3.5 rounded-xl hover:bg-muted transition-all duration-200 flex items-center justify-between gap-4">
                     <div className="flex items-center gap-4 min-w-0">
-                      <div className="h-11 w-11 rounded-xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-sm flex items-center justify-center flex-shrink-0 shadow-sm">
+                      <div className="h-11 w-11 rounded-xl bg-primary dark:bg-transparent dark:bg-[image:var(--avatar-bg)] text-primary-foreground dark:text-foreground font-bold text-sm flex items-center justify-center flex-shrink-0 shadow-sm">
                         {initials}
                       </div>
                       <div className="min-w-0">
-                        <h4 className="text-base font-bold text-slate-900 dark:text-white truncate">{member.full_name}</h4>
-                        <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 font-semibold">{member.phone || 'Executive Officer'}</p>
+                        <h4 className="text-base font-bold text-foreground truncate">{member.full_name}</h4>
+                        <p className="text-xs text-muted-foreground mt-0.5 font-semibold">{member.phone || 'Executive Officer'}</p>
                       </div>
                     </div>
-                    <span className="bg-slate-100 text-slate-900 dark:bg-white/10 dark:text-slate-200 border border-slate-200 dark:border-white/10 rounded-md px-2.5 py-1 text-xs font-bold">
+                    <span className="bg-primary/10 text-primary border border-primary/20 dark:bg-badge-bg dark:text-badge-text dark:border-badge-border rounded-full px-3 py-1 text-xs font-bold">
                       {roleName}
                     </span>
                   </div>
@@ -283,52 +301,57 @@ async function StaffContent({ plantId, isSuperAdmin }: { plantId: string; isSupe
 
 function StaffSkeleton() {
   return (
-    <div className="w-full max-w-[1400px] mx-auto space-y-6">
+    <div className="w-full space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white dark:bg-bg-surface border border-slate-200 dark:border-white/10 rounded-2xl p-6 h-28 animate-pulse" />
-        <div className="bg-white dark:bg-bg-surface border border-slate-200 dark:border-white/10 rounded-2xl p-6 h-28 animate-pulse" />
-        <div className="bg-white dark:bg-bg-surface border border-slate-200 dark:border-white/10 rounded-2xl p-6 h-28 animate-pulse" />
-        <div className="bg-white dark:bg-bg-surface border border-slate-200 dark:border-white/10 rounded-2xl p-6 h-28 animate-pulse" />
+        <div className="bg-card border border-border rounded-2xl p-6 h-28 animate-pulse" />
+        <div className="bg-card border border-border rounded-2xl p-6 h-28 animate-pulse" />
+        <div className="bg-card border border-border rounded-2xl p-6 h-28 animate-pulse" />
+        <div className="bg-card border border-border rounded-2xl p-6 h-28 animate-pulse" />
       </div>
-      <div className="bg-white dark:bg-bg-surface border border-slate-200 dark:border-white/10 rounded-2xl p-8 h-64 animate-pulse" />
+      <div className="bg-card border border-border rounded-2xl p-8 h-64 animate-pulse" />
     </div>
   )
 }
 
 export default async function ManageStaffPage() {
   const supabase = await createClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  const user = session?.user
+  const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) redirect('/')
 
-  const role = user.user_metadata?.role || 'staff'
-  const isAdmin = role === 'local_admin' || role === 'super_admin'
+  let role = 'staff'
+  let plantId: string | null = null
+
+  const { data: profile } = await supabase.from('users').select('role, plant_id').eq('id', user.id).single()
+  role = profile?.role || user.user_metadata?.role || 'staff'
+  plantId = profile?.plant_id || user.app_metadata?.plant_id
+
+  const isExec = isSystemExecutive(role)
+  const isAdm = checkIsAdmin(role)
   const isSuperAdmin = role === 'super_admin'
-  let plantId = user.app_metadata?.plant_id
+  const canApprove = canApproveStaff(role)
 
-  if (!plantId && user.id) {
-    const { data: profile } = await supabase.from('users').select('plant_id').eq('id', user.id).single()
-    plantId = profile?.plant_id
-  }
-
-  if (!isAdmin) redirect('/portal')
+  if (!isAdm && !isExec) redirect('/portal')
 
   return (
     <div className="space-y-6">
       <PageHeader 
-        title="Manage Staff"
-        description="Facility staff directory, live duty tracking, and pending member approvals."
+        title={isExec ? "Staff Directory & Oversight" : "Manage Staff"}
+        description={
+          isExec
+            ? "Overview of facility staff roster, live duty tracking, and pending registrations."
+            : "Facility staff directory, live duty tracking, and pending member approvals."
+        }
         showBackButton={true}
       />
 
       {plantId ? (
         <Suspense fallback={<StaffSkeleton />}>
-          <StaffContent plantId={plantId} isSuperAdmin={isSuperAdmin} />
+          <StaffContent plantId={plantId} isSuperAdmin={isSuperAdmin} canApprove={canApprove} />
         </Suspense>
       ) : (
-        <div className="bg-white dark:bg-bg-surface border border-slate-200 dark:border-white/10 shadow-sm rounded-2xl p-12 text-center">
-          <p className="text-sm font-bold text-slate-900 dark:text-slate-300">No facility assigned to your account.</p>
+        <div className="bg-card border border-border shadow-sm rounded-2xl p-12 text-center">
+          <p className="text-sm font-bold text-foreground">No facility assigned to your account.</p>
         </div>
       )}
     </div>

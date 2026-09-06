@@ -46,7 +46,7 @@ export default function MobileNav() {
   ]
 
   return (
-    <nav className="fixed bottom-0 left-0 w-full z-50 flex items-center justify-around border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] backdrop-blur-xl transition-colors duration-300 md:hidden">
+    <nav className="fixed bottom-0 left-0 w-full z-50 flex items-center justify-around border-t border-border bg-card pb-[env(safe-area-inset-bottom)] backdrop-blur-xl transition-colors duration-300 md:hidden">
       {links.map((link) => {
         const isActive = pathname === link.href
         return (
@@ -56,7 +56,7 @@ export default function MobileNav() {
             className={`flex flex-col items-center gap-0.5 px-3 py-3 transition-all duration-300 ${
               isActive 
                 ? 'text-primary' 
-                : 'text-muted hover:text-secondary'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             {link.icon}

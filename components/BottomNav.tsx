@@ -9,24 +9,24 @@ export default function BottomNav() {
   return (
     <>
       <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40">
-        <div className="flex items-center gap-2 px-4 py-3 bg-white/70 dark:bg-black/70 backdrop-blur-xl rounded-full shadow-2xl border border-border-strong dark:border-gray-800">
+        <div className="flex items-center gap-2 px-4 py-3 bg-card/70 backdrop-blur-xl rounded-full shadow-2xl border border-border">
           
-          <button className="flex flex-col items-center justify-center w-16 h-12 rounded-full hover:bg-black/5 dark:hover:bg-surface-muted transition">
+          <button className="flex flex-col items-center justify-center w-16 h-12 rounded-full hover:bg-muted transition">
             <span className="text-xl">🏠</span>
-            <span className="text-[10px] font-medium mt-1 text-gray-700 dark:text-gray-300">Home</span>
+            <span className="text-[10px] font-medium mt-1 text-muted-foreground">Home</span>
           </button>
 
           <button 
             onClick={() => setIsComplaintOpen(true)}
-            className="flex flex-col items-center justify-center w-16 h-12 rounded-full hover:bg-black/5 dark:hover:bg-surface-muted transition"
+            className="flex flex-col items-center justify-center w-16 h-12 rounded-full hover:bg-muted transition"
           >
             <span className="text-xl">📸</span>
-            <span className="text-[10px] font-medium mt-1 text-gray-700 dark:text-gray-300">Report</span>
+            <span className="text-[10px] font-medium mt-1 text-muted-foreground">Report</span>
           </button>
 
-          <button className="flex flex-col items-center justify-center w-16 h-12 rounded-full hover:bg-black/5 dark:hover:bg-surface-muted transition">
+          <button className="flex flex-col items-center justify-center w-16 h-12 rounded-full hover:bg-muted transition">
             <span className="text-xl">📋</span>
-            <span className="text-[10px] font-medium mt-1 text-gray-700 dark:text-gray-300">Tasks</span>
+            <span className="text-[10px] font-medium mt-1 text-muted-foreground">Tasks</span>
           </button>
 
         </div>

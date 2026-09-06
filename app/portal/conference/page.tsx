@@ -4,8 +4,17 @@ import PrepQueueClient from './PrepQueueClient'
 import RoomSchedulerClient from './RoomSchedulerClient'
 import { Suspense } from 'react'
 import PageHeader from '@/components/PageHeader'
+import { isSystemExecutive, isCleaner as checkIsCleaner, canBookConferenceRooms } from '@/lib/auth/rbac'
 
-async function ConferenceContent({ isCleaner }: { isCleaner: boolean }) {
+async function ConferenceContent({
+  isCleaner,
+  isExecutive,
+  canBook,
+}: {
+  isCleaner: boolean
+  isExecutive: boolean
+  canBook: boolean
+}) {
   const [rooms, bookings] = await Promise.all([
     getConferenceRooms(),
     getTodayBookings()
@@ -24,7 +33,13 @@ async function ConferenceContent({ isCleaner }: { isCleaner: boolean }) {
       )}
 
       {/* Smart Room Scheduler Timeline */}
-      <RoomSchedulerClient rooms={rooms} bookings={bookings} isCleaner={isCleaner} />
+      <RoomSchedulerClient
+        rooms={rooms}
+        bookings={bookings}
+        isCleaner={isCleaner}
+        isExecutive={isExecutive}
+        canBook={canBook}
+      />
     </div>
   )
 }
@@ -39,22 +54,34 @@ function ConferenceSkeleton() {
 
 export default async function ConferencePage() {
   const supabase = await createClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  const user = session?.user
+  const { data: { user } } = await supabase.auth.getUser()
 
-  const role = user?.user_metadata?.role || 'staff'
-  const isCleaner = role === 'housekeeper' || role === 'cleaner'
+  let role = 'staff'
+  if (user) {
+    const { data: profile } = await supabase.from('users').select('role').eq('id', user.id).single()
+    role = profile?.role || user.user_metadata?.role || 'staff'
+  }
+
+  const isExec = isSystemExecutive(role)
+  const isCleaner = checkIsCleaner(role)
+  const canBook = canBookConferenceRooms(role)
 
   return (
     <div className="space-y-6">
       <PageHeader 
-        title="Conference Rooms"
-        description={isCleaner ? "Today's room preparation queue and schedules." : "Smart room scheduler and interactive Gantt timeline."}
+        title={isExec ? "Conference Room Utilization" : "Conference Rooms"}
+        description={
+          isExec
+            ? "Live visual timeline, room capacity, and daily meeting schedules."
+            : isCleaner
+            ? "Today's room preparation queue and schedules."
+            : "Smart room scheduler and interactive Gantt timeline."
+        }
         showBackButton={true}
       />
 
       <Suspense fallback={<ConferenceSkeleton />}>
-        <ConferenceContent isCleaner={isCleaner} />
+        <ConferenceContent isCleaner={isCleaner} isExecutive={isExec} canBook={canBook} />
       </Suspense>
     </div>
   )

@@ -26,10 +26,10 @@ export default async function PendingApprovalPage() {
   const isRejected = approvalStatus === 'rejected'
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-neutral-200/50 via-neutral-50 to-white p-6 dark:from-neutral-900 dark:via-neutral-950 dark:to-black">
-      <div className="w-full max-w-md rounded-3xl border border-white/60 bg-white/40 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-2xl dark:border-neutral-800/60 dark:bg-neutral-900/40 text-center animate-in fade-in zoom-in duration-500">
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-[#eef2fa] via-white to-[#f3e8ff] dark:!bg-[image:var(--bg-base-glow)] dark:bg-background p-6">
+      <div className="w-full max-w-md rounded-3xl border border-border bg-card p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-2xl text-center animate-in fade-in zoom-in duration-500">
         
-        <div className={`mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl shadow-sm ${isRejected ? 'bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400' : 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400'}`}>
+        <div className={`mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl shadow-sm ${isRejected ? 'bg-danger-bg text-danger' : 'bg-warning-bg text-warning'}`}>
           {isRejected ? (
             <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -41,20 +41,20 @@ export default async function PendingApprovalPage() {
           )}
         </div>
 
-        <h1 className="mb-2 text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+        <h1 className="mb-2 text-2xl font-bold tracking-tight text-foreground">
           {isRejected ? 'Account Rejected' : 'Approval Pending'}
         </h1>
         
-        <p className="mb-8 text-sm text-neutral-500 dark:text-neutral-400">
+        <p className="mb-8 text-sm text-muted-foreground">
           {isRejected 
             ? 'Your request for access has been declined by an administrator. If you believe this is a mistake, please contact your facility manager.'
-            : 'Your account has been created successfully, but it requires administrator approval before you can access the facility portal. Please check back later.'}
+            : 'Your account has been created successfully, but it requires administrator approval before you can access FacilityOS. Please check back later.'}
         </p>
 
         <form action={logOut}>
           <button 
             type="submit"
-            className="w-full rounded-xl bg-neutral-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-neutral-800 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200 shadow-sm"
+            className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground transition hover:bg-primary/90 dark:bg-[image:var(--accent-gradient)] dark:shadow-[0_0_12px_var(--accent-glow)] shadow-sm"
           >
             Sign Out
           </button>

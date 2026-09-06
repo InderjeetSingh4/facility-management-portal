@@ -33,14 +33,14 @@ export default function Sidebar({ email, formattedRole, initial, isAdmin }: Side
         href={href} 
         className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm transition-all duration-300 ${
           isActive 
-            ? 'bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-500 dark:to-blue-500 text-white font-semibold shadow-md shadow-indigo-500/20' 
-            : 'text-slate-600 dark:text-text-muted font-medium hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-white/5'
+            ? 'bg-primary text-primary-foreground font-semibold shadow-md' 
+            : 'text-muted-foreground font-medium hover:text-foreground hover:bg-muted'
         }`}
       >
-        <svg className={`h-4 w-4 flex-shrink-0 transition-colors ${isActive ? 'text-white' : 'text-slate-500 dark:text-text-muted group-hover:text-indigo-600 dark:group-hover:text-indigo-400'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
+        <svg className={`h-4 w-4 flex-shrink-0 transition-colors ${isActive ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-foreground'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
           {icon}
         </svg>
-        <span className={isActive ? "text-white font-semibold" : ""}>
+        <span className={isActive ? "text-primary-foreground font-semibold" : ""}>
           {name}
         </span>
       </Link>
@@ -48,30 +48,30 @@ export default function Sidebar({ email, formattedRole, initial, isAdmin }: Side
   }
 
   return (
-    <aside className="hidden md:flex flex-col w-64 fixed inset-y-4 left-4 z-40 bg-surface backdrop-blur-2xl border border-border shadow-sm rounded-3xl transition-colors duration-300">
+    <aside className="hidden md:flex flex-col w-64 fixed inset-y-4 left-4 z-40 bg-card backdrop-blur-2xl border border-border shadow-sm rounded-3xl transition-colors duration-300">
       <div className="flex-1 overflow-y-auto p-6 flex flex-col justify-between">
         <div>
           {/* User Profile Card */}
-          <div className="mb-8 flex items-center gap-3 rounded-2xl border border-border bg-surface-solid/20 p-3 backdrop-blur-sm">
-            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#3b82f6] text-lg font-semibold text-white">
+          <div className="mb-8 flex items-center gap-3 rounded-2xl border border-border bg-background p-3 backdrop-blur-sm">
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary text-lg font-semibold text-primary-foreground">
               {initial}
             </div>
             <div className="overflow-hidden">
-              <h2 className="truncate text-sm font-semibold tracking-tight text-primary">{email.split('@')[0]}</h2>
-              <p className="truncate text-xs font-medium text-secondary">{formattedRole}</p>
+              <h2 className="truncate text-sm font-semibold tracking-tight text-foreground">{email.split('@')[0]}</h2>
+              <p className="truncate text-xs font-medium text-muted-foreground">{formattedRole}</p>
             </div>
           </div>
 
           {/* Navigation */}
           <nav className="flex flex-col gap-1">
-            <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted">Main</div>
+            <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Main</div>
             {mainLinks.map((link) => (
               <NavLink key={link.href} {...link} />
             ))}
 
             {isAdmin && (
               <>
-                <div className="mb-2 mt-6 text-[11px] font-semibold uppercase tracking-widest text-muted">Management</div>
+                <div className="mb-2 mt-6 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground">Management</div>
                 {adminLinks.map((link) => (
                   <NavLink key={link.href} {...link} />
                 ))}
@@ -83,7 +83,7 @@ export default function Sidebar({ email, formattedRole, initial, isAdmin }: Side
         {/* Bottom: Sign Out */}
         <div className="mt-8 space-y-3">
           <form action={logOut}>
-            <button type="submit" className="w-full rounded-xl border border-border bg-surface-solid/20 px-4 py-2.5 text-sm font-medium text-secondary transition-all duration-300 hover:bg-surface-solid/40 hover:text-primary">
+            <button type="submit" className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm font-medium text-muted-foreground transition-all duration-300 hover:bg-muted hover:text-foreground">
               Sign Out
             </button>
           </form>

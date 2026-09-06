@@ -1,34 +1,21 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
 
-/* ─── Light Illustration Theme Tokens ─── */
+/* ─── Monochrome Theme Tokens ─── */
 :root {
-  /* Ambient Background */
-  --canvas-from: #eef1fa;
-  --canvas-via: #eef1fa;
-  --canvas-to: #eef1fa;
+  /* Light mode */
+  --background: #fafafa;
+  --foreground: #0a0a0a;
+  --card: #ffffff;
+  --card-foreground: #0a0a0a;
+  --border: rgba(0, 0, 0, 0.08);
+  --muted: #f2f2f2;
+  --muted-foreground: #555555;
+  --primary: #0a0a0a;
+  --primary-foreground: #fafafa;
+  --ring: rgba(0, 0, 0, 0.12);
 
-  /* Surfaces */
-  --background: #eef1fa;
-  --surface: #f6f8fd; 
-  --surface-muted: rgba(246, 248, 253, 0.6);
-  --surface-solid: #ffffff;
-  --surface-shadow: rgba(33, 72, 196, 0.08);
-
-  /* Borders */
-  --border: #d7dceb;
-  --border-strong: #2148c4;
-
-  /* Typography */
-  --text-primary: #1e293b;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-
-  /* Accent - Premium Indigo/Blue */
-  --accent: #4f46e5;
-  --accent-hover: #4338ca;
-  --accent-foreground: #ffffff;
-
-  /* Status Colors (Lightened slightly for light bg) */
+  /* Status Colors (Keep semantic meaning) */
   --success: #10b981;
   --success-bg: rgba(16, 185, 129, 0.1);
   --success-border: rgba(16, 185, 129, 0.2);
@@ -40,84 +27,94 @@
   --danger: #ef4444;
   --danger-bg: rgba(239, 68, 68, 0.1);
   --danger-border: rgba(239, 68, 68, 0.2);
-
-  --neutral-pill-text: #6b7590;
-  --neutral-pill-bg: #eef1fa;
-  --neutral-pill-border: #d7dceb;
-
-  /* Sidebar */
-  --sidebar-bg: #f6f8fd;
-  --sidebar-text: #1e2a5e;
-  --sidebar-text-muted: #6b7590;
-  --sidebar-border: #d7dceb;
 }
 
 .dark {
-  /* backgrounds */
-  --bg-page: #000000;
-  --bg-surface: #0D0D0F;
-  --bg-surface-raised: #141416;
+  /* Helios Dark Theme Base Tokens - Muted Palette */
+  --bg-base: #0A0A0A;
+  --bg-base-glow: radial-gradient(ellipse 60% 50% at 50% 15%, rgba(168, 132, 167, 0.10) 0%, rgba(10, 10, 10, 0) 65%), #0A0A0A;
+  --shell-bg: #0D0A14;
+  --shell-border: rgba(255, 255, 255, 0.05);
+  --shell-radius: 32px;
+  
+  --card-bg: #17141A;
+  --card-border: rgba(255, 255, 255, 0.06);
+  --card-radius: 20px;
+  --card-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  
+  --text-primary: #F2EEF1;
+  --text-secondary: #948C93;
+  --text-tertiary: #6B646A;
+  
+  --accent-solid: #A8849B;
+  --accent-muted-bg: rgba(168, 132, 155, 0.30);
+  --accent-glow: rgba(168, 132, 155, 0.22);
 
-  /* accent */
-  --accent: #00E5FF;
-  --accent-dim: #0891A8;
-  --accent-on: #00252B;
+  --badge-bg: rgba(168, 132, 155, 0.14);
+  --badge-border: rgba(168, 132, 155, 0.25);
+  --badge-text: #D4C4CE;
+  
+  --avatar-bg: linear-gradient(135deg, #221E23 0%, #17141A 100%);
+  
+  --nav-active-bg: var(--accent-muted-bg);
+  --nav-active-border: rgba(255, 255, 255, 0.08);
+  
+  --toggle-active-bg: var(--accent-muted-bg);
+  --toggle-active-text: #FFFFFF;
+  --toggle-inactive-bg: transparent;
+  --toggle-inactive-text: var(--text-secondary);
+  --toggle-border: rgba(255, 255, 255, 0.08);
+  
+  --chart-line: #F5F0FF;
+  --chart-area-fill: linear-gradient(180deg, rgba(168, 132, 155, 0.35) 0%, rgba(168, 132, 155, 0) 100%);
+  --chart-grid: rgba(255, 255, 255, 0.04);
+  --chart-tooltip-bg: #1C1727;
+  --chart-tooltip-border: rgba(168, 132, 155, 0.3);
+  --chart-dot-glow: 0 0 12px 4px rgba(168, 132, 155, 0.5);
+  
+  --fab-bg: #17131F;
+  --fab-border: rgba(255, 255, 255, 0.08);
+  --fab-icon: #F5F3F7;
+  --fab-accent-glow: 0 0 24px rgba(168, 132, 155, 0.25);
 
-  /* text */
-  --text-primary: #F5F5F5;
-  --text-muted: #8A8F94;
+  /* Mapping to existing standard tokens for dark mode */
+  --background: var(--bg-base);
+  --foreground: var(--text-primary);
+  --card: var(--card-bg);
+  --card-foreground: var(--text-primary);
+  --border: var(--card-border);
+  --muted: var(--shell-bg);
+  --muted-foreground: var(--text-secondary);
+  --primary: var(--accent-solid);          
+  --primary-foreground: #FFFFFF;
+  --ring: var(--accent-glow);
 
-  /* borders */
-  --border-hairline: rgba(255, 255, 255, 0.08);
-  --border-dashed: rgba(255, 255, 255, 0.15);
+  /* Status Colors (Keep semantic meaning but map to new values) */
+  --success: #5FAE7A;
+  --success-bg: rgba(95, 174, 122, 0.12);
+  --success-border: rgba(95, 174, 122, 0.2);
 
-  /* Fallback mapped variables */
-  --background: var(--bg-page);
-  --surface: var(--bg-surface);
-  --border: var(--border-hairline);
-  --border-strong: var(--border-dashed);
-
-  /* Status Colors */
-  --success: #34d399;
-  --success-bg: rgba(52, 211, 153, 0.1);
-  --success-border: rgba(52, 211, 153, 0.2);
+  --danger: #C07373;
+  --danger-bg: rgba(192, 115, 115, 0.12);
+  --danger-border: rgba(192, 115, 115, 0.2);
+  
   --warning: #fbbf24;
   --warning-bg: rgba(251, 191, 36, 0.1);
   --warning-border: rgba(251, 191, 36, 0.2);
-  --danger: #f87171;
-  --danger-bg: rgba(248, 113, 113, 0.1);
-  --danger-border: rgba(248, 113, 113, 0.2);
 }
 
 @theme inline {
-  --color-bg-page: var(--bg-page);
-  --color-bg-surface: var(--bg-surface);
-  --color-bg-surface-raised: var(--bg-surface-raised);
-
-  --color-accent: var(--accent);
-  --color-accent-dim: var(--accent-dim);
-  --color-accent-on: var(--accent-on);
-
-  --color-text-primary: var(--text-primary);
-  --color-text-muted: var(--text-muted);
-
-  --color-border-hairline: var(--border-hairline);
-  --color-border-dashed: var(--border-dashed);
-
-  --color-canvas-from: var(--canvas-from);
-  --color-canvas-via: var(--canvas-via);
-  --color-canvas-to: var(--canvas-to);
   --color-background: var(--background);
-  --color-surface: var(--surface);
-  --color-surface-muted: var(--surface-muted);
-  --color-surface-solid: var(--surface-solid);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
   --color-border: var(--border);
-  --color-border-strong: var(--border-strong);
-  --color-primary: var(--text-primary);
-  --color-secondary: var(--text-secondary);
-  --color-muted: var(--text-muted);
-  --color-accent-hover: var(--accent-hover);
-  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-ring: var(--ring);
+
   --color-success: var(--success);
   --color-success-bg: var(--success-bg);
   --color-success-border: var(--success-border);
@@ -127,22 +124,26 @@
   --color-danger: var(--danger);
   --color-danger-bg: var(--danger-bg);
   --color-danger-border: var(--danger-border);
-  --color-neutral-pill-text: var(--neutral-pill-text);
-  --color-neutral-pill-bg: var(--neutral-pill-bg);
-  --color-neutral-pill-border: var(--neutral-pill-border);
-  --color-sidebar-bg: var(--sidebar-bg);
-  --color-sidebar-text: var(--sidebar-text);
-  --color-sidebar-text-muted: var(--sidebar-text-muted);
-  --color-sidebar-border: var(--sidebar-border);
 
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
   --font-heading: 'Space Grotesk', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
+
+  /* Custom Helios Utility Mappings */
+  --color-shell-bg: var(--shell-bg);
+  --color-shell-border: var(--shell-border);
+  --radius-shell: var(--shell-radius);
+  --shadow-card: var(--card-shadow);
+  --color-text-tertiary: var(--text-tertiary);
+
+  --color-badge-bg: var(--badge-bg);
+  --color-badge-border: var(--badge-border);
+  --color-badge-text: var(--badge-text);
 }
 
 body {
-  background-color: #eef1fa;
-  color: #2a3350;
+  background-color: var(--background);
+  color: var(--foreground);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
@@ -150,4 +151,22 @@ body {
 /* Custom WebKit scrollbar with glass styling */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: rgba(128, 128, 128, 0.2); border-radius: 3px; }
+
+/* Invert calendar & clock picker icons to white in dark mode or with picker-white class */
+.dark input[type="date"]::-webkit-calendar-picker-indicator,
+.dark input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="date"].picker-white::-webkit-calendar-picker-indicator,
+input[type="time"].picker-white::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(100%);
+  cursor: pointer;
+  transform: scale(1.15);
+  margin-right: 4px;
+}
+
+/* Force text utility classes to use the foreground color (fixes contrast issue) */
+.text-muted,
+.text-text-muted,
+.text-muted-foreground {
+  color: var(--muted-foreground) !important;
+}

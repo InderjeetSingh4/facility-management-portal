@@ -2,7 +2,7 @@ import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.facilityportal.app',
-  appName: 'Facility Portal',
+  appName: 'FacilityOS',
   webDir: 'public',
   server: {
     url: 'https://facility-management-portal-theta.vercel.app',

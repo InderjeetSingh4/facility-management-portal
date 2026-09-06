@@ -145,11 +145,11 @@ export default function ComplaintBox({ isOpen, onClose }: ComplaintBoxProps) {
     >
       <div className="absolute inset-0 bg-background/70 backdrop-blur-md" onClick={closeSheet} />
 
-      <div className="relative w-full max-w-md bg-surface backdrop-blur-2xl border border-border rounded-2xl shadow-xl p-6 sm:rounded-2xl">
-        <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-surface-muted sm:hidden" />
+      <div className="relative w-full max-w-md bg-card backdrop-blur-2xl border border-border rounded-2xl shadow-xl p-6 sm:rounded-2xl">
+        <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-muted sm:hidden" />
 
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-semibold tracking-tight text-primary">
+          <h2 className="text-lg font-semibold tracking-tight text-foreground">
             Report an issue
           </h2>
           <button
@@ -157,7 +157,7 @@ export default function ComplaintBox({ isOpen, onClose }: ComplaintBoxProps) {
             onClick={closeSheet}
             disabled={isBusy}
             aria-label="Close"
-            className="flex h-8 w-8 items-center justify-center rounded-full text-muted active:scale-95 transition-all duration-200 hover:bg-surface-muted hover:text-primary disabled:opacity-40"
+            className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground active:scale-95 transition-all duration-200 hover:bg-muted hover:text-foreground disabled:opacity-40"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -175,7 +175,7 @@ export default function ComplaintBox({ isOpen, onClose }: ComplaintBoxProps) {
 
         {submitState === 'success' ? (
           <div className="flex flex-col items-center gap-3 py-6 text-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-success-bg text-success border border-success-border">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -189,14 +189,14 @@ export default function ComplaintBox({ isOpen, onClose }: ComplaintBoxProps) {
                 <path d="M20 6 9 17l-5-5" />
               </svg>
             </div>
-            <p className="text-sm font-medium text-primary">Complaint submitted</p>
+            <p className="text-sm font-medium text-foreground">Complaint submitted</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label
                 htmlFor="complaint-title"
-                className="mb-1.5 block text-xs font-medium text-muted"
+                className="mb-1.5 block text-xs font-medium text-muted-foreground"
               >
                 Title
               </label>
@@ -207,7 +207,7 @@ export default function ComplaintBox({ isOpen, onClose }: ComplaintBoxProps) {
                 onChange={(e) => setTitle(e.target.value)}
                 disabled={isBusy}
                 placeholder="e.g. Leaking pipe in restroom"
-                className="w-full rounded-xl border border-border bg-surface px-4 py-2.5 text-sm text-primary placeholder:text-muted outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60"
+                className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:opacity-60"
               />
             </div>
 
@@ -232,7 +232,7 @@ export default function ComplaintBox({ isOpen, onClose }: ComplaintBoxProps) {
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isBusy}
-                  className="absolute bottom-2 right-2 rounded-full bg-surface-solid/80 px-3 py-1.5 text-xs font-medium text-primary backdrop-blur-md active:scale-95 transition-all duration-200 hover:bg-surface-solid disabled:opacity-40"
+                  className="absolute bottom-2 right-2 rounded-full bg-background/80 px-3 py-1.5 text-xs font-medium text-foreground backdrop-blur-md active:scale-95 transition-all duration-200 hover:bg-background disabled:opacity-40"
                 >
                   Retake
                 </button>
@@ -242,7 +242,7 @@ export default function ComplaintBox({ isOpen, onClose }: ComplaintBoxProps) {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isBusy}
-                className="flex h-36 w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border-strong bg-surface text-muted active:scale-95 transition-all duration-200 hover:border-white/40 hover:text-primary disabled:opacity-40"
+                className="flex h-36 w-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-card text-muted-foreground active:scale-95 transition-all duration-200 hover:border-border hover:text-foreground disabled:opacity-40"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -264,7 +264,7 @@ export default function ComplaintBox({ isOpen, onClose }: ComplaintBoxProps) {
             <div>
               <label
                 htmlFor="complaint-description"
-                className="mb-1.5 block text-xs font-medium text-muted"
+                className="mb-1.5 block text-xs font-medium text-muted-foreground"
               >
                 Description
               </label>
@@ -275,14 +275,14 @@ export default function ComplaintBox({ isOpen, onClose }: ComplaintBoxProps) {
                 disabled={isBusy}
                 placeholder="What's the issue?"
                 rows={3}
-                className="w-full resize-none rounded-xl border border-border bg-surface px-4 py-3 text-sm text-primary placeholder:text-muted outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 disabled:opacity-60"
+                className="w-full resize-none rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20 disabled:opacity-60"
               />
             </div>
 
             {errorMessage && (
               <div
                 role="alert"
-                className="rounded-xl border border-rose-500/30 bg-rose-500/20 px-4 py-2.5 text-sm text-rose-300"
+                className="rounded-xl border border-danger-border bg-danger-bg px-4 py-2.5 text-sm text-danger"
               >
                 {errorMessage}
               </div>
@@ -291,7 +291,7 @@ export default function ComplaintBox({ isOpen, onClose }: ComplaintBoxProps) {
             <button
               type="submit"
               disabled={isBusy}
-              className="w-full rounded-xl bg-[#3b82f6] px-4 py-3 text-sm font-medium text-primary shadow-lg active:scale-95 transition-all duration-200 hover:bg-[#2563eb] disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-medium text-primary-foreground shadow-sm active:scale-95 transition-all duration-200 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isBusy ? 'Submitting…' : 'Submit complaint'}
             </button>

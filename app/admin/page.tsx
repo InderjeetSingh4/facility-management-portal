@@ -16,10 +16,10 @@ export default async function AdminDashboardPage() {
     .order('created_at', { ascending: false })
 
   return (
-    <main className="min-h-screen bg-neutral-100 px-6 py-10 dark:bg-neutral-950">
+    <main className="min-h-screen bg-background px-6 py-10">
       <Link 
         href="/portal" 
-        className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-neutral-500 transition hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white"
+        className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-muted-foreground transition hover:text-foreground"
       >
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M19 12H5M12 19l-7-7 7-7"/>
@@ -30,15 +30,15 @@ export default async function AdminDashboardPage() {
       <header className="mb-12">
         <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-center">
           <div>
-            <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">Manager Dashboard</p>
-            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-neutral-900 dark:text-white">Admin Control Center</h1>
+            <p className="text-sm font-medium text-muted-foreground">Manager Dashboard</p>
+            <h1 className="mt-1 text-3xl font-semibold tracking-tight text-foreground">Admin Control Center</h1>
           </div>
           
-          <div className="flex gap-1 rounded-xl border border-neutral-200 bg-white p-1 shadow-sm dark:border-neutral-800 dark:bg-neutral-900">
-            <Link href="/admin" className="rounded-lg bg-neutral-900 px-5 py-2 text-sm font-medium text-white shadow-sm dark:bg-white dark:text-neutral-900">
+          <div className="flex gap-1 rounded-xl border border-border bg-card p-1 shadow-sm">
+            <Link href="/admin" className="rounded-lg bg-foreground px-5 py-2 text-sm font-medium text-background shadow-sm">
               Complaints
             </Link>
-            <Link href="/admin/notices" className="rounded-lg px-5 py-2 text-sm font-medium text-neutral-600 transition hover:bg-neutral-50 dark:text-neutral-400 dark:hover:bg-neutral-800">
+            <Link href="/admin/notices" className="rounded-lg px-5 py-2 text-sm font-medium text-muted-foreground transition hover:bg-muted">
               Notices
             </Link>
           </div>
@@ -48,11 +48,11 @@ export default async function AdminDashboardPage() {
       <AdminMetrics />
 
       <section className="mb-6">
-        <h2 className="text-xl font-semibold text-neutral-900 dark:text-white">Manage Complaints</h2>
+        <h2 className="text-xl font-semibold text-foreground">Manage Complaints</h2>
       </section>
 
       {error ? (
-        <div role="alert" className="mb-6 rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div role="alert" className="mb-6 rounded-xl border border-danger-border bg-danger-bg px-4 py-3 text-sm text-danger">
           Could not load complaints. Please refresh the page.
         </div>
       ) : (

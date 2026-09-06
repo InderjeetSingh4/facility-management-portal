@@ -11,27 +11,25 @@ const config: Config = {
     extend: {
       colors: {
         background: "var(--background)",
+        foreground: "var(--foreground)",
         
-        "bg-page": "var(--bg-page)",
-        "bg-surface": "var(--bg-surface)",
-        "bg-surface-raised": "var(--bg-surface-raised)",
-
-        accent: {
-          DEFAULT: "var(--accent)",
-          dim: "var(--accent-dim)",
-          on: "var(--accent-on)",
+        card: {
+          DEFAULT: "var(--card)",
+          foreground: "var(--card-foreground)",
         },
 
-        border: {
-          DEFAULT: "var(--border)",
-          strong: "var(--border-strong)",
-          hairline: "var(--border-hairline)",
-          dashed: "var(--border-dashed)",
+        muted: {
+          DEFAULT: "var(--muted)",
+          foreground: "var(--muted-foreground)",
         },
-        
-        primary: "var(--text-primary)",
-        secondary: "var(--text-secondary)",
-        muted: "var(--text-muted)",
+
+        primary: {
+          DEFAULT: "var(--primary)",
+          foreground: "var(--primary-foreground)",
+        },
+
+        border: "var(--border)",
+        ring: "var(--ring)",
         
         success: {
           DEFAULT: "var(--success)",
@@ -57,7 +55,7 @@ const config: Config = {
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       boxShadow: {
-        surface: "0 10px 15px -3px var(--surface-shadow), 0 4px 6px -4px var(--surface-shadow)",
+        surface: "0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.08)",
       },
       keyframes: {
         shimmer: {

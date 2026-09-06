@@ -3,9 +3,9 @@ import { Network } from '@capacitor/network'
 import { toggleTaskCompletion, submitForApproval } from '@/app/portal/actions'
 import { toast } from 'sonner'
 
-// Configure localforage instance for facility portal
+// Configure localforage instance for FacilityOS
 localforage.config({
-  name: 'FacilityPortalDB',
+  name: 'FacilityOSDB',
   storeName: 'offline_store',
   description: 'IndexedDB cache and sync queue for offline field operations',
 })

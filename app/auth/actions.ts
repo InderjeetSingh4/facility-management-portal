@@ -35,12 +35,17 @@ export async function signInUser(prevState: any, formData: FormData) {
 export async function signUpUser(prevState: any, formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
-  const role = formData.get('role') as string
+  const rawRole = (formData.get('role') as string || 'cleaner').toLowerCase().trim()
   const fullName = formData.get('full_name') as string
 
-  if (!email || !password || !role || !fullName) {
+  if (!email || !password || !fullName) {
     return { error: 'All fields are required.' }
   }
+
+  // Security: Public signup cannot self-assign privileged roles (super_admin, system_executive, local_admin)
+  // Privileged roles must be assigned by authorized administrators.
+  const allowedPublicRoles = ['housekeeper', 'employee']
+  const assignedRole = allowedPublicRoles.includes(rawRole) ? rawRole : 'housekeeper'
 
   const supabase = await createClient()
 
@@ -60,9 +65,10 @@ export async function signUpUser(prevState: any, formData: FormData) {
     password,
     options: {
       data: {
-        role: role,
+        role: assignedRole,
         plant_id: defaultPlant.id,
-        full_name: fullName
+        full_name: fullName,
+        approval_status: 'pending'
       }
     }
   })

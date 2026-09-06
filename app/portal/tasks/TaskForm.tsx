@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { createChecklistTask } from '../actions'
+import { toast } from 'sonner'
 
 const DAYS = [
   { value: 0, label: 'Sunday' },
@@ -21,8 +22,15 @@ const labelCls = 'mb-1.5 block text-xs font-bold uppercase tracking-wider text-s
 export default function TaskForm() {
   const [frequency, setFrequency] = useState('daily')
 
+  const handleSubmit = async (formData: FormData) => {
+    const res = await createChecklistTask(formData)
+    if (res && (res as any).error) {
+      toast.error((res as any).error)
+    }
+  }
+
   return (
-    <form action={createChecklistTask} className="flex flex-col gap-4 sm:flex-row sm:items-end">
+    <form action={handleSubmit} className="flex flex-col gap-4 sm:flex-row sm:items-end">
       {/* Title */}
       <div className="flex-1">
         <label className={labelCls} htmlFor="task-title">Title</label>

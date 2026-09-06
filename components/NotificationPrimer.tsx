@@ -35,22 +35,22 @@ export default function NotificationPrimer({ onDismiss }: NotificationPrimerProp
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-border bg-surface p-8 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-300">
+      <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-border bg-card p-8 shadow-2xl backdrop-blur-xl animate-in zoom-in-95 duration-300">
         
         <button 
           onClick={handleNotNow}
-          className="absolute right-4 top-4 rounded-full p-2 text-secondary hover:bg-surface-solid/50 hover:text-primary transition-colors"
+          className="absolute right-4 top-4 rounded-full p-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
         >
           <X size={20} />
         </button>
 
-        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-accent/20 text-accent mx-auto">
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-primary/20 text-primary mx-auto">
           <BellRing size={32} />
         </div>
 
         <div className="text-center">
-          <h2 className="mb-2 text-xl font-bold tracking-tight text-primary">Never miss an update</h2>
-          <p className="mb-8 text-sm text-secondary">
+          <h2 className="mb-2 text-xl font-bold tracking-tight text-foreground">Never miss an update</h2>
+          <p className="mb-8 text-sm text-muted-foreground">
             Get notified instantly about new tasks, complaints, and important facility notices.
           </p>
         </div>
@@ -59,7 +59,7 @@ export default function NotificationPrimer({ onDismiss }: NotificationPrimerProp
           <button
             onClick={handleEnable}
             disabled={isRequesting}
-            className="w-full rounded-2xl bg-[#3b82f6] px-4 py-3.5 text-sm font-bold text-white shadow-md transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
+            className="w-full rounded-2xl bg-primary px-4 py-3.5 text-sm font-bold text-primary-foreground shadow-md transition-all hover:opacity-90 active:scale-[0.98] disabled:opacity-50"
           >
             {isRequesting ? 'Enabling...' : 'Enable Notifications'}
           </button>
@@ -67,7 +67,7 @@ export default function NotificationPrimer({ onDismiss }: NotificationPrimerProp
           <button
             onClick={handleNotNow}
             disabled={isRequesting}
-            className="w-full rounded-2xl bg-transparent px-4 py-3.5 text-sm font-bold text-secondary transition-all hover:bg-surface-solid/50 active:scale-[0.98] disabled:opacity-50"
+            className="w-full rounded-2xl bg-transparent px-4 py-3.5 text-sm font-bold text-muted-foreground transition-all hover:bg-muted active:scale-[0.98] disabled:opacity-50"
           >
             Not Now
           </button>

@@ -129,16 +129,16 @@ export default function WeeklyReportButton() {
       type="button"
       onClick={handleGenerateReport}
       disabled={isGenerating}
-      className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 shadow-sm transition-all duration-200 hover:bg-slate-50 active:scale-95 disabled:opacity-60"
+      className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-sm transition-all duration-200 hover:opacity-90 active:scale-95 disabled:opacity-60 border-none"
     >
       {isGenerating ? (
         <>
-          <Loader2 size={16} className="animate-spin text-indigo-600" />
+          <Loader2 size={16} className="animate-spin text-primary-foreground" />
           <span>Generating...</span>
         </>
       ) : (
         <>
-          <Download size={16} className="text-indigo-600" />
+          <Download size={16} className="text-primary-foreground" />
           <span>Download Weekly Report</span>
         </>
       )}

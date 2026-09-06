@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
   LayoutDashboard, CheckSquare, AlertCircle,
-  Calendar, Users, BarChart, Building2, Settings, HelpCircle, LogOut
+  Calendar, Users, BarChart, Building2, Settings, HelpCircle, LogOut, ClipboardCheck
 } from "lucide-react"
 import { useEffect, useState } from "react"
 import ThemeToggle from "./ThemeToggle"
@@ -13,6 +13,7 @@ import UserDropdown from "./UserDropdown"
 import NativePushHandler from "./NativePushHandler"
 import OfflineIndicator from "./OfflineIndicator"
 import NotificationPrimer from "./NotificationPrimer"
+import Logo from "./Logo"
 
 interface PortalShellProps {
   children: React.ReactNode
@@ -21,6 +22,8 @@ interface PortalShellProps {
   formattedRole: string
   initial: string
   isAdmin: boolean
+  isExecutive?: boolean
+  role?: string
   notificationsEnabled: boolean | null
 }
 
@@ -31,6 +34,8 @@ export default function PortalShell({
   formattedRole,
   initial,
   isAdmin,
+  isExecutive = false,
+  role,
   notificationsEnabled: initialNotificationsEnabled,
 }: PortalShellProps) {
   const [mounted, setMounted] = useState(false)
@@ -39,102 +44,115 @@ export default function PortalShell({
 
   useEffect(() => setMounted(true), [])
 
-  const navItems = [
-    { name: "Dashboard", href: "/portal", icon: LayoutDashboard },
-    { name: "Tasks", href: "/portal/tasks", icon: CheckSquare },
-    { name: "Complaints", href: "/portal/complaints", icon: AlertCircle },
-    { name: "Conference", href: "/portal/conference", icon: Calendar },
-  ]
+  // Dynamic Navigation Configuration
+  const mainNavItems = isExecutive
+    ? [
+        { name: "Overview", href: "/portal", icon: LayoutDashboard },
+        { name: "Tasks", href: "/portal/tasks", icon: CheckSquare },
+        { name: "Complaints", href: "/portal/complaints", icon: AlertCircle },
+        { name: "Conference", href: "/portal/conference", icon: Calendar },
+      ]
+    : [
+        { name: "Dashboard", href: "/portal", icon: LayoutDashboard },
+        { name: "Tasks", href: "/portal/tasks", icon: CheckSquare },
+        { name: "Complaints", href: "/portal/complaints", icon: AlertCircle },
+        { name: "Conference", href: "/portal/conference", icon: Calendar },
+      ]
 
-  const adminItems = [
-    { name: "Manage Staff", href: "/portal/staff", icon: Users },
-    { name: "Analytics", href: "/portal/analytics", icon: BarChart },
-  ]
+  const secondaryNavSection = isExecutive
+    ? {
+        title: "Reporting",
+        items: [
+          { name: "Staff Directory", href: "/portal/staff", icon: Users },
+          { name: "Attendance", href: "/portal/attendance", icon: ClipboardCheck },
+          { name: "Analytics", href: "/portal/analytics", icon: BarChart },
+        ]
+      }
+    : isAdmin
+    ? {
+        title: "Management",
+        items: [
+          { name: "Manage Staff", href: "/portal/staff", icon: Users },
+          { name: "Attendance", href: "/portal/attendance", icon: ClipboardCheck },
+          { name: "Analytics", href: "/portal/analytics", icon: BarChart },
+        ]
+      }
+    : null
 
   return (
-    <div className="min-h-screen bg-background text-primary transition-colors duration-500 flex relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-background dark:bg-transparent text-foreground transition-colors duration-500 flex relative overflow-hidden font-sans">
       
       {/* ── Ambient Radial Blur Background ── */}
-      <div className="fixed -top-[20%] -left-[10%] w-[60vw] h-[60vh] rounded-full bg-accent/10 blur-[140px] pointer-events-none z-0" />
-      <div className="fixed top-[40%] -right-[10%] w-[50vw] h-[50vh] rounded-full bg-accent/5 blur-[140px] pointer-events-none z-0" />
+      <div className="absolute -top-[20%] -left-[10%] w-[60vw] h-[60vh] rounded-full bg-black/5 dark:hidden blur-[120px] pointer-events-none z-0" />
+      <div className="absolute top-[40%] -right-[10%] w-[50vw] h-[50vh] rounded-full bg-black/5 dark:hidden blur-[120px] pointer-events-none z-0" />
 
       {/* ─────────────────────────────────────────
           DESKTOP SIDEBAR
       ───────────────────────────────────────── */}
-      <aside className="hidden md:flex flex-col fixed top-0 left-0 h-screen w-64 bg-white dark:bg-bg-page border-r border-black/5 dark:border-border-hairline z-40 flex-shrink-0 justify-between">
+      <aside className="hidden md:flex flex-col fixed top-5 left-5 bottom-5 w-56 bg-card border-[0.5px] border-border z-40 flex-shrink-0 justify-between rounded-[28px] shadow-surface py-5 px-3.5">
 
-        <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">
+        <div className="flex flex-col flex-1 min-h-0 overflow-y-auto custom-scrollbar">
           {/* Brand */}
-          <div className="flex items-center gap-3 px-6 py-6 border-b border-black/5 dark:border-border-hairline flex-shrink-0">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-600 to-blue-600 text-white dark:bg-bg-surface-raised dark:text-accent dark:border dark:border-border-hairline flex-shrink-0 shadow-md shadow-indigo-500/20">
-              <Building2 size={24} />
-            </div>
-            <div>
-              <p className="text-lg font-heading font-bold !text-black dark:!text-text-primary leading-tight tracking-wide">Facility Portal</p>
-              <p className="text-sm !text-black/60 dark:!text-text-muted leading-tight">Management Suite</p>
-            </div>
-          </div>
+          <Link href="/portal" className="flex items-center px-1 pb-5 border-b border-border flex-shrink-0 group">
+            <Logo size="md" showSubtitle />
+          </Link>
 
           {/* Nav */}
-          <nav className="flex flex-col flex-1 gap-1 px-4 py-6">
+          <nav className="flex flex-col flex-1 gap-1.5 mt-4">
 
-            <p className="mt-4 mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-neutral-400">
+            <p className="mb-1.5 px-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               Main
             </p>
 
-            {navItems.map((item) => {
+            {mainNavItems.map((item) => {
               const isActive = pathname === item.href
               return (
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 mx-2 text-base transition-all duration-200 ${
+                  className={
                     isActive
-                      ? "bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-500 dark:to-blue-500 text-white font-semibold shadow-md shadow-indigo-500/20"
-                      : "text-slate-600 dark:text-text-muted font-medium hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-white/5"
-                  }`}
+                      ? "flex items-center gap-3 px-4 py-3 bg-primary dark:bg-transparent dark:bg-[var(--nav-active-bg)] dark:border dark:border-[var(--nav-active-border)] text-primary-foreground rounded-full transition-all group shadow-sm"
+                      : "flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted border border-transparent rounded-full transition-all group"
+                  }
                 >
                   <item.icon
-                    size={20}
+                    size={18}
                     className={`flex-shrink-0 transition-colors ${
-                      isActive
-                        ? "text-white"
-                        : "text-slate-500 dark:text-text-muted group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+                      isActive ? "text-primary-foreground dark:text-foreground" : "text-muted-foreground group-hover:text-foreground"
                     }`}
                   />
-                  <span className={isActive ? "text-white font-semibold" : ""}>
+                  <span className={`text-sm font-medium ${isActive ? "text-primary-foreground dark:text-foreground" : "text-muted-foreground group-hover:text-foreground"}`}>
                     {item.name}
                   </span>
                 </Link>
               )
             })}
 
-            {isAdmin && (
+            {secondaryNavSection && (
               <>
-                <p className="mb-2 mt-8 px-3 text-xs font-semibold uppercase tracking-wider text-slate-400 dark:text-neutral-400">
-                  Management
+                <p className="mb-1.5 mt-6 px-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                  {secondaryNavSection.title}
                 </p>
-                {adminItems.map((item) => {
+                {secondaryNavSection.items.map((item) => {
                   const isActive = pathname === item.href
                   return (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`group flex items-center gap-3 rounded-xl px-4 py-2.5 mx-2 text-base transition-all duration-200 ${
+                      className={
                         isActive
-                          ? "bg-gradient-to-r from-indigo-600 to-blue-600 dark:from-indigo-500 dark:to-blue-500 text-white font-semibold shadow-md shadow-indigo-500/20"
-                          : "text-slate-600 dark:text-text-muted font-medium hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50/50 dark:hover:bg-white/5"
-                      }`}
+                          ? "flex items-center gap-3 px-4 py-3 bg-primary dark:bg-transparent dark:bg-[var(--nav-active-bg)] dark:border dark:border-[var(--nav-active-border)] text-primary-foreground rounded-full transition-all group shadow-sm"
+                          : "flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-muted border border-transparent rounded-full transition-all group"
+                      }
                     >
                       <item.icon
-                        size={20}
+                        size={18}
                         className={`flex-shrink-0 transition-colors ${
-                          isActive
-                            ? "text-white"
-                            : "text-slate-500 dark:text-text-muted group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
+                          isActive ? "text-primary-foreground dark:text-foreground" : "text-muted-foreground group-hover:text-foreground"
                         }`}
                       />
-                      <span className={isActive ? "text-white font-semibold" : ""}>
+                      <span className={`text-sm font-medium ${isActive ? "text-primary-foreground dark:text-foreground" : "text-muted-foreground group-hover:text-foreground"}`}>
                         {item.name}
                       </span>
                     </Link>
@@ -146,18 +164,18 @@ export default function PortalShell({
         </div>
 
         {/* Premium User Profile Footer */}
-        <div className="p-4 border-t border-black/5 dark:border-border-hairline flex-shrink-0">
-          <div className="bg-white/60 dark:bg-bg-surface-raised backdrop-blur-md border border-white/50 dark:border-white/10 shadow-sm rounded-2xl p-3 flex items-center justify-between hover:bg-white/80 dark:hover:bg-white/10 transition-all cursor-pointer group">
-            <div className="flex items-center gap-3 min-w-0 flex-1 pr-2">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-bold text-sm flex-shrink-0 shadow-sm">
+        <div className="mt-auto pt-4 border-t border-border flex-shrink-0">
+          <div className="bg-background border-none shadow-none rounded-full py-2 px-3 flex items-center justify-between hover:bg-muted transition-all cursor-pointer group">
+            <div className="flex items-center gap-2.5 min-w-0 flex-1 pr-1">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary dark:bg-[image:var(--avatar-bg)] text-primary-foreground dark:text-foreground font-bold text-xs flex-shrink-0 shadow-sm">
                 {initial}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-slate-800 dark:text-text-primary">{fullName}</p>
-                <p className="truncate text-xs text-slate-500 dark:text-text-muted">{formattedRole}</p>
+                <p className="truncate text-xs font-semibold text-foreground">{fullName}</p>
+                <p className="truncate text-[11px] text-muted-foreground">{formattedRole}</p>
               </div>
             </div>
-            <LogOut size={16} className="text-slate-400 group-hover:text-slate-700 dark:group-hover:text-white transition-colors flex-shrink-0" />
+            <LogOut size={15} className="text-muted-foreground group-hover:text-foreground transition-colors flex-shrink-0" />
           </div>
         </div>
       </aside>
@@ -165,21 +183,18 @@ export default function PortalShell({
       {/* ─────────────────────────────────────────
           MAIN CONTENT AREA
       ───────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col md:pl-[260px] w-full min-w-0">
+      <div className="flex-1 flex flex-col md:pl-[264px] w-full min-w-0">
 
         {/* HEADER BAR — floating pill */}
-        <div className="sticky top-3 z-30 px-4 md:px-8 pointer-events-none">
-          <header className="pointer-events-auto flex h-16 items-center justify-between bg-white/40 dark:bg-white/5 backdrop-blur-3xl border border-white/60 dark:border-white/10 rounded-full px-4 md:px-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none transition-all duration-300">
-            <div className="flex items-center gap-2 md:hidden">
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#3b82f6] text-white dark:bg-[#3b82f6] dark:text-white">
-                <Building2 size={16} />
-              </div>
-              <span className="text-sm font-semibold text-primary">Facility Portal</span>
-            </div>
+        <div className="sticky top-2.5 z-30 px-4 md:px-6 pointer-events-none">
+          <header className="pointer-events-auto flex h-14 items-center justify-between bg-card/60 backdrop-blur-3xl border border-border rounded-full px-4 md:px-5 shadow-surface transition-all duration-300">
+            <Link href="/portal" className="flex items-center md:hidden group">
+              <Logo size="sm" />
+            </Link>
 
             <div className="hidden md:block" />
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <ThemeToggle />
               <UserDropdown
                 email={email}
@@ -193,7 +208,7 @@ export default function PortalShell({
         </div>
 
         {/* PAGE CONTENT */}
-        <main className="flex-1 pb-28 md:pb-12 pt-8 w-full">
+        <main className="flex-1 pb-24 md:pb-10 pt-5 w-full">
           <AnimatePresence mode="wait">
             <motion.div
               key={pathname}
@@ -201,7 +216,7 @@ export default function PortalShell({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="w-full max-w-[1440px] mx-auto px-5 md:px-10"
+              className="w-full max-w-[1180px] mx-auto px-4 sm:px-6 lg:px-8"
             >
               {children}
             </motion.div>
@@ -212,16 +227,16 @@ export default function PortalShell({
       {/* ─────────────────────────────────────────
           MOBILE BOTTOM NAV
       ───────────────────────────────────────── */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white dark:bg-bg-surface border-t border-black/5 dark:border-border-hairline pb-[env(safe-area-inset-bottom)]">
+      <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-card border-t border-border pb-[env(safe-area-inset-bottom)]">
         <nav className="flex items-center justify-around p-2">
-          {navItems.map((item) => {
+          {mainNavItems.map((item) => {
             const isActive = pathname === item.href
             return (
               <Link
                 key={item.name}
                 href={item.href}
                 className={`relative flex flex-1 flex-col items-center justify-center gap-1 py-2 active:scale-95 transition-all duration-200 ${
-                  isActive ? "text-[#3b82f6] dark:text-accent" : "text-black/50 dark:text-text-muted dark:hover:text-text-primary"
+                  isActive ? "text-primary" : "text-muted-foreground hover:text-foreground"
                 }`}
               >
                 <div className="relative z-10 flex flex-col items-center gap-1">

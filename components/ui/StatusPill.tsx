@@ -14,13 +14,13 @@ export default function StatusPill({ status, className = '' }: StatusPillProps) 
     case 'resolved':
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border border-success-border bg-success-bg px-2.5 py-1 text-[11px] font-semibold text-success ${className}`}
+          className={`inline-flex items-center justify-center bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-full px-3 py-1 text-xs font-medium ${className}`}
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-success flex-shrink-0" />
-          {status === 'resolved' ? 'Resolved' : 'Approved'}
+          Resolved
         </span>
       )
 
+    case 'reviewed':
     case 'pending_approval':
       return (
         <span
@@ -31,6 +31,7 @@ export default function StatusPill({ status, className = '' }: StatusPillProps) 
         </span>
       )
 
+    case 'dismissed':
     case 'rejected':
       return (
         <span
@@ -41,14 +42,14 @@ export default function StatusPill({ status, className = '' }: StatusPillProps) 
         </span>
       )
 
+    case 'pending':
     case 'open':
     default:
       return (
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border border-neutral-pillBorder bg-neutral-pillBg px-2.5 py-1 text-[11px] font-semibold text-neutral-pillText ${className}`}
+          className={`inline-flex items-center justify-center bg-muted border border-border text-foreground rounded-full px-3 py-1 text-xs font-medium ${className}`}
         >
-          <span className="h-1.5 w-1.5 rounded-full bg-neutral-pillText flex-shrink-0" />
-          Open
+          New
         </span>
       )
   }

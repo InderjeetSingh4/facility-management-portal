@@ -39,7 +39,7 @@ export default function AnimatedCanvas() {
           d="M 10vw 15vh C 40vw 15vh, 60vw 80vh, 75vw 80vh"
           fill="none"
           stroke="currentColor"
-          className="text-slate-900 dark:text-accent"
+          className="text-foreground dark:text-primary"
           strokeWidth="2"
           strokeDasharray="8 8"
           initial={{ strokeDashoffset: 1000 }}
@@ -53,7 +53,7 @@ export default function AnimatedCanvas() {
         return (
           <motion.div
             key={i}
-            className="absolute text-slate-400/20 dark:text-text-muted/20"
+            className="absolute text-muted-foreground/20"
             style={{ top: `${item.top}%`, left: `${item.left}%` }}
             animate={{ 
               y: [0, -20, 0], 

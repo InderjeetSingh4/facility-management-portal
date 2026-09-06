@@ -95,20 +95,20 @@ export default function TaskListClient({ tasks: initialTasks, isAdmin, currentUs
         {/* Hero Progress Widget */}
         <motion.div variants={itemVariants}>
           <GlassCard className="p-8 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 dark:bg-accent/10 rounded-full blur-[90px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+            <div className="absolute top-0 right-0 w-80 h-80 bg-foreground/5 rounded-full blur-[90px] -translate-y-1/2 translate-x-1/3 pointer-events-none" />
             <div className="relative z-10 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6">
               <div>
-                <h2 className="text-4xl lg:text-5xl font-semibold text-slate-900 dark:text-text-primary tracking-tight">Here is your agenda for today</h2>
-                <p className="text-lg text-slate-600 dark:text-text-muted mt-3">You have {totalTasks - completedTasks} tasks left to complete.</p>
+                <h2 className="text-4xl lg:text-5xl font-semibold text-foreground tracking-tight">Here is your agenda for today</h2>
+                <p className="text-lg text-muted-foreground mt-3">You have {totalTasks - completedTasks} tasks left to complete.</p>
               </div>
               <div className="flex flex-col items-end gap-3 w-full sm:w-80">
-                <span className="font-mono text-sm font-bold text-slate-900 dark:text-text-primary uppercase tracking-wider">{progressPercent}% Complete</span>
-                <div className="w-full h-4 bg-black/5 dark:bg-bg-surface-raised rounded-full overflow-hidden border border-black/5 dark:border-white/10">
+                <span className="font-mono text-sm font-bold text-foreground uppercase tracking-wider">{progressPercent}% Complete</span>
+                <div className="w-full h-4 bg-muted rounded-full overflow-hidden border border-border">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${progressPercent}%` }}
                     transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-                    className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 dark:from-accent-dim dark:to-accent rounded-full"
+                    className="h-full bg-primary rounded-full"
                   />
                 </div>
               </div>
@@ -121,17 +121,17 @@ export default function TaskListClient({ tasks: initialTasks, isAdmin, currentUs
           <AnimatePresence mode="popLayout">
             {tasks.length === 0 ? (
               <GlassCard className="p-12 text-center">
-                <p className="text-slate-600 dark:text-text-muted font-medium">No tasks found.</p>
+                <p className="text-muted-foreground font-medium">No tasks found.</p>
               </GlassCard>
             ) : (
               <GlassCard className="p-0 overflow-hidden">
                 {/* Today Section */}
                 {todayTasks.length > 0 && (
                   <div>
-                    <div className="bg-black/[0.03] dark:bg-white/[0.03] px-6 py-3.5 border-b border-black/5 dark:border-white/10">
-                      <h3 className="text-xs font-bold text-slate-500 dark:text-text-muted uppercase tracking-widest">Today</h3>
+                    <div className="dark:bg-[rgba(168,132,155,0.08)] bg-muted px-6 py-3.5 border-b dark:border-[rgba(168,132,155,0.12)] border-border">
+                      <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Today</h3>
                     </div>
-                    <div className="divide-y divide-black/5 dark:divide-white/10">
+                    <div className="divide-y divide-border">
                       {todayTasks.map((task: any) => (
                         <TaskRow
                           key={task.id}
@@ -149,10 +149,10 @@ export default function TaskListClient({ tasks: initialTasks, isAdmin, currentUs
                 {/* Upcoming Section */}
                 {upcomingTasks.length > 0 && (
                   <div>
-                    <div className="bg-black/[0.03] dark:bg-white/[0.03] px-6 py-3.5 border-b border-black/5 dark:border-white/10 border-t border-black/5 dark:border-white/10">
-                      <h3 className="text-xs font-bold text-slate-500 dark:text-text-muted uppercase tracking-widest">Upcoming</h3>
+                    <div className="dark:bg-[rgba(168,132,155,0.08)] bg-muted px-6 py-3.5 border-b dark:border-[rgba(168,132,155,0.12)] border-border border-t">
+                      <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Upcoming</h3>
                     </div>
-                    <div className="divide-y divide-black/5 dark:divide-white/10">
+                    <div className="divide-y divide-border">
                       {upcomingTasks.map((task: any) => (
                         <TaskRow
                           key={task.id}
@@ -216,8 +216,13 @@ function TaskRow({
       toast.info('Task updated offline. Changes will sync when online.')
     } else {
       setTasks(prev => prev.map(t => t.id === task.id ? { ...t, isCompleted: !t.isCompleted } : t))
-      startTransition(() => {
-        toggleTaskCompletion(task.id)
+      startTransition(async () => {
+        const res = await toggleTaskCompletion(task.id)
+        if (res && (res as any).error) {
+          // Revert optimistic update
+          setTasks(prev => prev.map(t => t.id === task.id ? { ...t, isCompleted: !t.isCompleted } : t))
+          toast.error((res as any).error)
+        }
       })
     }
   }
@@ -226,8 +231,13 @@ function TaskRow({
     if (showConfirm) {
       setIsDeleting(true)
       setTasks(prev => prev.filter(t => t.id !== task.id))
-      startTransition(() => {
-        deleteChecklistTask(task.id)
+      startTransition(async () => {
+        const res = await deleteChecklistTask(task.id)
+        if (res && (res as any).error) {
+          // Revert deletion
+          setTasks(prev => [...prev, task])
+          toast.error((res as any).error)
+        }
       })
     } else {
       setShowConfirm(true)
@@ -238,8 +248,8 @@ function TaskRow({
   const isHighPriority = task.title.toLowerCase().includes('urgent') || task.title.toLowerCase().includes('repair')
   const priorityLabel = isHighPriority ? 'High' : 'Routine'
   const priorityStyles = isHighPriority 
-    ? 'bg-transparent text-red-500 border-red-500' 
-    : 'bg-transparent text-blue-500 border-blue-500 dark:text-accent dark:border-accent'
+    ? 'bg-foreground text-background border-border dark:bg-[rgba(192,110,110,0.16)] dark:border-[rgba(192,110,110,0.28)] dark:text-[#E3B7B7]' 
+    : 'bg-background text-muted-foreground border-border'
 
   const formattedDate = useMemo(() => {
     if (!task.target_date) return 'Today, 5:00 PM'
@@ -254,11 +264,11 @@ function TaskRow({
 
   return (
     <div
-      className={`group relative bg-transparent p-6 flex items-center justify-between transition-colors duration-200 hover:bg-black/[0.03] dark:hover:bg-white/[0.03] ${isCompleted ? 'opacity-60' : ''}`}
+      className={`group relative bg-transparent p-6 flex items-center justify-between transition-colors duration-200 hover:bg-muted ${isCompleted ? 'opacity-60' : ''}`}
     >
       {/* High Priority Glowing Edge */}
       {isHighPriority && !isCompleted && (
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-red-400 to-rose-600 shadow-[0_0_15px_rgba(239,68,68,0.5)]" />
+        <div className="absolute left-0 top-0 bottom-0 w-1 bg-foreground dark:bg-[rgba(192,110,110,0.65)] shadow-sm" />
       )}
 
       <div className="flex items-center justify-between flex-1 min-w-0 z-10 gap-6">
@@ -266,16 +276,16 @@ function TaskRow({
           <button
             onClick={handleToggle}
             disabled={isPending || isDeleting}
-            className={`relative flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300 ease-out active:scale-90 ${
+            className={`relative flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border-[1.5px] transition-all duration-300 ease-out active:scale-90 ${
               isCompleted 
-                ? 'border-emerald-500 bg-emerald-500 text-white shadow-[0_0_15px_rgba(16,185,129,0.3)]' 
-                : 'border-black/30 dark:border-neutral-700 bg-transparent text-transparent hover:border-blue-500 hover:bg-blue-500/10 dark:hover:border-neutral-300 dark:hover:bg-white/10'
+                ? 'border-primary bg-primary text-primary-foreground shadow-sm' 
+                : 'border-border bg-transparent text-transparent hover:border-primary hover:bg-muted'
             }`}
           >
-            <CheckCircle2 size={16} className={`${isCompleted ? 'opacity-100 scale-100' : 'opacity-0 scale-50'} transition-all duration-300`} strokeWidth={3} />
+            <CheckCircle2 size={16} className={`${isCompleted ? 'opacity-100 scale-100' : 'opacity-0 scale-50'} transition-all duration-300`} strokeWidth={1.5} />
           </button>
           
-          <h3 className={`font-sans font-medium text-lg leading-snug truncate transition-all duration-300 ${isCompleted ? 'line-through text-slate-400 dark:text-text-muted' : 'text-slate-900 dark:text-text-primary'}`}>
+          <h3 className={`font-sans font-medium text-lg leading-snug truncate transition-all duration-300 ${isCompleted ? 'line-through text-muted-foreground' : 'text-foreground'}`}>
             {task.title}
           </h3>
         </div>
@@ -284,8 +294,8 @@ function TaskRow({
           <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-widest border ${priorityStyles}`}>
             {priorityLabel}
           </span>
-          <div className="flex items-center gap-2 text-sm font-medium font-mono text-slate-600 dark:text-text-muted whitespace-nowrap justify-end min-w-[130px]">
-            <Clock size={15} className="flex-shrink-0" />
+          <div className="flex items-center gap-2 text-sm font-medium font-mono text-muted-foreground whitespace-nowrap justify-end min-w-[130px]">
+            <Clock size={15} className="flex-shrink-0" strokeWidth={1.5} />
             <span className="whitespace-nowrap">{formattedDate}</span>
           </div>
         </div>
@@ -293,7 +303,7 @@ function TaskRow({
 
       {/* Reveal-on-Hover Quick Actions Pane */}
       <div className="flex items-center gap-2 flex-shrink-0 z-10 transition-all duration-300 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0">
-        <div className="hidden sm:flex h-8 w-8 items-center justify-center rounded-full bg-neutral-200 dark:bg-bg-surface-raised text-neutral-600 dark:text-text-muted text-xs font-bold border border-black/5 dark:border-white/10 shadow-sm">
+        <div className="hidden sm:flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground text-xs font-bold border border-border shadow-sm">
           JD
         </div>
         
@@ -303,12 +313,12 @@ function TaskRow({
             disabled={isDeleting || isPending || isOffline}
             className={`flex items-center justify-center h-8 w-8 rounded-full transition-all duration-200 ${
               showConfirm
-                ? 'bg-red-500 text-white shadow-md'
-                : 'bg-black/5 dark:bg-white/10 hover:bg-red-500/10 text-neutral-500 hover:text-red-600 dark:text-text-muted dark:hover:text-red-400 shadow-sm backdrop-blur-md'
+                ? 'bg-danger-bg text-danger shadow-sm'
+                : 'bg-muted hover:bg-danger-bg text-muted-foreground hover:text-danger shadow-sm backdrop-blur-md'
             }`}
             title={showConfirm ? 'Click to confirm' : 'Delete'}
           >
-            <Trash2 size={14} />
+            <Trash2 size={14} strokeWidth={1.5} />
           </button>
         )}
       </div>
@@ -326,37 +336,37 @@ function QuickStatsWidget({ tasks }: { tasks: any[] }) {
 
   return (
     <GlassCard className="p-8">
-      <h3 className="text-xl font-semibold text-slate-900 dark:text-text-primary mb-8">Quick Stats</h3>
+      <h3 className="text-xl font-semibold text-foreground mb-8">Quick Stats</h3>
       
       <div className="space-y-6">
         <div className="flex items-center justify-between group">
           <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 group-hover:scale-110 transition-transform">
-              <AlertTriangle size={20} />
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-muted text-foreground group-hover:scale-110 transition-transform">
+              <AlertTriangle size={20} strokeWidth={1.5} />
             </div>
-            <span className="text-lg font-medium text-slate-700 dark:text-text-muted">High Priority</span>
+            <span className="text-lg font-medium text-muted-foreground">High Priority</span>
           </div>
-          <span className="text-3xl lg:text-4xl font-bold font-mono text-slate-900 dark:text-text-primary">{highPriority}</span>
+          <span className="text-3xl lg:text-4xl font-bold font-mono text-foreground">{highPriority}</span>
         </div>
 
         <div className="flex items-center justify-between group">
           <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400 group-hover:scale-110 transition-transform">
-              <Clock size={20} />
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-muted text-foreground group-hover:scale-110 transition-transform">
+              <Clock size={20} strokeWidth={1.5} />
             </div>
-            <span className="text-lg font-medium text-slate-700 dark:text-text-muted">Overdue</span>
+            <span className="text-lg font-medium text-muted-foreground">Overdue</span>
           </div>
-          <span className="text-3xl lg:text-4xl font-bold font-mono text-slate-900 dark:text-text-primary">{overdue}</span>
+          <span className="text-3xl lg:text-4xl font-bold font-mono text-foreground">{overdue}</span>
         </div>
 
         <div className="flex items-center justify-between group">
           <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
-              <CheckSquare size={20} />
+            <div className="flex items-center justify-center w-12 h-12 rounded-full bg-muted text-foreground group-hover:scale-110 transition-transform">
+              <CheckSquare size={20} strokeWidth={1.5} />
             </div>
-            <span className="text-lg font-medium text-slate-700 dark:text-text-muted">Completed</span>
+            <span className="text-lg font-medium text-muted-foreground">Completed</span>
           </div>
-          <span className="text-3xl lg:text-4xl font-bold font-mono text-slate-900 dark:text-text-primary">{completed}</span>
+          <span className="text-3xl lg:text-4xl font-bold font-mono text-foreground">{completed}</span>
         </div>
       </div>
     </GlassCard>
@@ -373,19 +383,19 @@ function RecentActivityWidget() {
 
   return (
     <GlassCard className="p-8">
-      <h3 className="text-xl font-semibold text-slate-900 dark:text-text-primary mb-8">Recent Activity</h3>
+      <h3 className="text-xl font-semibold text-foreground mb-8">Recent Activity</h3>
       
-      <div className="relative pl-[18px] space-y-8 before:absolute before:inset-y-0 before:left-2 before:w-[1px] before:bg-black/10 dark:before:bg-white/10">
+      <div className="relative pl-[18px] space-y-8 before:absolute before:inset-y-0 before:left-2 before:w-[1px] before:bg-border">
         {activities.map((act) => {
-          let dotColor = "bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.4)]"
-          if (act.type === "complete") dotColor = "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.4)]"
-          if (act.type === "add") dotColor = "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.4)]"
+          let dotColor = "bg-muted shadow-sm"
+          if (act.type === "complete") dotColor = "bg-success-bg border-success-border"
+          if (act.type === "add") dotColor = "bg-primary text-primary-foreground"
 
           return (
             <div key={act.id} className="relative">
-              <span className={`absolute -left-[23px] top-1.5 w-2.5 h-2.5 rounded-full ${dotColor} border-[2px] border-white dark:border-bg-surface z-10`} />
-              <p className="text-base font-medium text-slate-800 dark:text-text-primary leading-snug">{act.text}</p>
-              <span className="text-sm font-mono text-slate-500 dark:text-text-muted mt-1 block">{act.time}</span>
+              <span className={`absolute -left-[23px] top-1.5 w-2.5 h-2.5 rounded-full ${dotColor} border-[2px] border-border z-10`} />
+              <p className="text-base font-medium text-foreground leading-snug">{act.text}</p>
+              <span className="text-sm font-mono text-muted-foreground mt-1 block">{act.time}</span>
             </div>
           )
         })}

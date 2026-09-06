@@ -27,17 +27,17 @@ export default function IOSInstallPrompt() {
   if (!isVisible || !isIOSBrowser) return null
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[100] mx-4 mb-6 rounded-2xl border border-white/40 bg-white/60 p-4 shadow-xl backdrop-blur-xl dark:border-neutral-700/60 dark:bg-neutral-900/60">
+    <div className="fixed bottom-0 left-0 right-0 z-[100] mx-4 mb-6 rounded-2xl border border-border bg-card/60 p-4 shadow-xl backdrop-blur-xl">
       <div className="flex items-start justify-between">
-        <div className="pr-4 text-sm font-medium text-neutral-800 dark:text-neutral-200">
-          <p className="font-bold text-neutral-900 dark:text-white">Enable Live Notifications</p>
+        <div className="pr-4 text-sm font-medium text-muted-foreground">
+          <p className="font-bold text-foreground">Enable Live Notifications</p>
           <p className="mt-1">
             For live push notifications, tap the <span className="font-bold">Share</span> icon at the bottom of your browser and select <span className="font-bold">"Add to Home Screen"</span>.
           </p>
         </div>
         <button
           onClick={() => setIsVisible(false)}
-          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-black/5 text-neutral-500 transition hover:bg-black/10 dark:bg-surface-muted dark:text-neutral-400 dark:hover:bg-surface-muted"
+          className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground transition hover:bg-muted/80 hover:text-foreground"
           aria-label="Dismiss"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

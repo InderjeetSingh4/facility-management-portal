@@ -4,11 +4,11 @@ import { Providers } from "./providers";
 import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "Facility Portal",
+  title: "FacilityOS",
   description: "Enterprise Facility Management Dashboard",
   appleWebApp: {
     capable: true,
-    title: "Portal",
+    title: "FacilityOS",
     statusBarStyle: "black-translucent",
   },
 };
@@ -31,7 +31,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="min-h-full flex flex-col bg-gradient-to-br from-[#eef2fa] via-white to-[#f3e8ff] dark:!bg-none dark:bg-bg-page bg-fixed bg-no-repeat text-primary dark:text-text-primary"
+        className="min-h-full flex flex-col bg-gradient-to-br from-[#eef2fa] via-white to-[#f3e8ff] dark:!bg-[image:var(--bg-base-glow)] dark:bg-background bg-fixed bg-no-repeat text-foreground"
       >
         <Providers>
           <div className="relative z-10 flex-1 flex flex-col">

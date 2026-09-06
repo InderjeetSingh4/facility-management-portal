@@ -31,17 +31,17 @@ export default function AuditTrail({
   }
 
   return (
-    <div className="mt-4 border-t border-slate-100 pt-4 text-xs">
+    <div className="mt-4 border-t border-border pt-4 text-xs">
       <p className="mb-3 text-[10px] font-semibold uppercase tracking-widest text-muted">
         Audit Trail
       </p>
 
       <div className="space-y-2.5">
         {/* Step 1: Reported */}
-        <div className="flex items-start gap-2.5 text-slate-600">
+        <div className="flex items-start gap-2.5 text-muted-foreground">
           <AlertCircle size={13} className="mt-0.5 text-muted flex-shrink-0" />
           <div>
-            <span className="font-semibold text-slate-900">{reportedBy}</span>
+            <span className="font-semibold text-foreground">{reportedBy}</span>
             {' '}reported issue
             <span className="ml-1.5 text-[10px] text-muted">{formatDate(createdAt)}</span>
           </div>
@@ -49,10 +49,10 @@ export default function AuditTrail({
 
         {/* Step 2: Resolved by worker */}
         {resolvedByName && resolvedAt && (
-          <div className="flex items-start gap-2.5 text-slate-600">
-            <Clock size={13} className="mt-0.5 text-amber-500 flex-shrink-0" />
+          <div className="flex items-start gap-2.5 text-muted-foreground">
+            <Clock size={13} className="mt-0.5 text-warning flex-shrink-0" />
             <div>
-              <span className="font-semibold text-slate-900">{resolvedByName}</span>
+              <span className="font-semibold text-foreground">{resolvedByName}</span>
               {' '}marked as fixed
               <span className="ml-1.5 text-[10px] text-muted">{formatDate(resolvedAt)}</span>
             </div>
@@ -61,11 +61,11 @@ export default function AuditTrail({
 
         {/* Step 3: Approved */}
         {status === 'approved' && approvedByName && approvedAt && (
-          <div className="flex items-start gap-2.5 text-emerald-700">
-            <CheckCircle2 size={13} className="mt-0.5 text-emerald-500 flex-shrink-0" />
+          <div className="flex items-start gap-2.5 text-success">
+            <CheckCircle2 size={13} className="mt-0.5 text-success flex-shrink-0" />
             <div>
               Approved by{' '}
-              <span className="font-semibold text-slate-900">{approvedByName}</span>
+              <span className="font-semibold text-foreground">{approvedByName}</span>
               <span className="ml-1.5 text-[10px] text-muted">{formatDate(approvedAt)}</span>
             </div>
           </div>
@@ -73,14 +73,14 @@ export default function AuditTrail({
 
         {/* Step 3: Rejected */}
         {status === 'rejected' && approvedByName && approvedAt && (
-          <div className="flex items-start gap-2.5 text-red-600">
-            <XCircle size={13} className="mt-0.5 text-red-500 flex-shrink-0" />
+          <div className="flex items-start gap-2.5 text-danger">
+            <XCircle size={13} className="mt-0.5 text-danger flex-shrink-0" />
             <div>
               Rejected by{' '}
-              <span className="font-semibold text-slate-900">{approvedByName}</span>
+              <span className="font-semibold text-foreground">{approvedByName}</span>
               <span className="ml-1.5 text-[10px] text-muted">{formatDate(approvedAt)}</span>
               {rejectionNote && (
-                <p className="mt-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-[11px] italic text-red-700">
+                <p className="mt-2 rounded-lg border border-danger bg-danger-bg px-3 py-2 text-[11px] italic text-danger">
                   "{rejectionNote}"
                 </p>
               )}

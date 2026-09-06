@@ -1,10 +1,10 @@
-// @ts-nocheck
 'use server'
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { NOTICE_COLOR_THEMES } from '@/lib/notices/color-themes'
 import type { NoticeColorTheme } from '@/types/database'
+import { authorizeUser } from '@/app/portal/actions'
 
 export interface ResolveComplaintState {
   error: string | null
@@ -15,6 +15,12 @@ export async function resolveComplaint(
   _prevState: ResolveComplaintState,
   _formData: FormData
 ): Promise<ResolveComplaintState> {
+  try {
+    await authorizeUser(['local_admin', 'super_admin'])
+  } catch (err: any) {
+    return { error: 'Forbidden: Insufficient permissions' }
+  }
+
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -44,6 +50,12 @@ export async function createNotice(
   _prevState: CreateNoticeState,
   formData: FormData
 ): Promise<CreateNoticeState> {
+  try {
+    await authorizeUser(['local_admin', 'super_admin'])
+  } catch (err: any) {
+    return { error: 'Forbidden: Insufficient permissions', success: false }
+  }
+
   const title = (formData.get('title') as string | null)?.trim()
   const details = (formData.get('details') as string | null)?.trim()
   const dateString = (formData.get('date_string') as string | null)?.trim()
@@ -98,7 +110,14 @@ export async function createNotice(
   revalidatePath('/admin/notices')
   return { error: null, success: true }
 }
+
 export async function deleteNotice(noticeId: string, imageUrl?: string | null) {
+  try {
+    await authorizeUser(['local_admin', 'super_admin'])
+  } catch (err: any) {
+    return { error: 'Forbidden: Insufficient permissions' }
+  }
+
   const supabase = await createClient()
 
   // If there is an image attached, delete it from the storage bucket first
@@ -117,7 +136,6 @@ export async function deleteNotice(noticeId: string, imageUrl?: string | null) {
     return { error: 'Failed to delete notice.' }
   }
 
-  // Refresh both pages so the notice disappears instantly
   revalidatePath('/portal')
   revalidatePath('/admin/notices')
   return { error: null }

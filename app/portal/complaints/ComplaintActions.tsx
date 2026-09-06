@@ -7,9 +7,10 @@ interface ComplaintActionsProps {
   complaintId: string
   status: string
   isAdmin: boolean
+  isExecutive?: boolean
 }
 
-export default function ComplaintActions({ complaintId, status, isAdmin }: ComplaintActionsProps) {
+export default function ComplaintActions({ complaintId, status, isAdmin, isExecutive = false }: ComplaintActionsProps) {
   const [isPending, startTransition] = useTransition()
   const [showRejectModal, setShowRejectModal] = useState(false)
   const [rejectionNote, setRejectionNote] = useState('')
@@ -35,20 +36,20 @@ export default function ComplaintActions({ complaintId, status, isAdmin }: Compl
     })
   }
 
-  if (status === 'approved') {
+  if (isExecutive || status === 'resolved' || status === 'approved') {
     return null
   }
 
   return (
     <div className="flex flex-col gap-2">
 
-      {/* OPEN — worker marks as fixed */}
-      {status === 'open' && (
+      {/* NEW / PENDING / OPEN — worker marks as fixed */}
+      {(status === 'pending' || status === 'open' || status === 'new') && (
         <button
           type="button"
           disabled={isPending}
           onClick={handleSubmitForApproval}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#3b82f6] px-5 py-3 text-xs font-semibold text-white shadow-sm hover:bg-[#2563eb] active:scale-[0.98] transition-all disabled:opacity-50"
+          className="inline-flex w-full items-center justify-center gap-2 bg-muted hover:bg-primary hover:text-primary-foreground border border-border text-foreground transition-all rounded-lg py-2 px-4 text-sm active:scale-[0.98] disabled:opacity-50"
         >
           {isPending ? (
             <span className="flex items-center gap-2">
@@ -69,8 +70,8 @@ export default function ComplaintActions({ complaintId, status, isAdmin }: Compl
         </button>
       )}
 
-      {/* PENDING APPROVAL — admin sees approve / reject */}
-      {status === 'pending_approval' && (
+      {/* IN PROGRESS / REVIEWED / PENDING APPROVAL — admin sees approve / reject */}
+      {(status === 'reviewed' || status === 'pending_approval') && (
         isAdmin ? (
           <div className="flex flex-col sm:flex-row gap-2">
             <button
@@ -89,7 +90,7 @@ export default function ComplaintActions({ complaintId, status, isAdmin }: Compl
               type="button"
               disabled={isPending}
               onClick={() => setShowRejectModal(true)}
-              className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full border border-danger-border bg-surface px-5 py-3 text-xs font-semibold text-danger shadow-sm hover:bg-danger-bg active:scale-[0.98] transition-all disabled:opacity-50"
+              className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full border border-danger-border bg-card px-5 py-3 text-xs font-semibold text-danger shadow-sm hover:bg-danger-bg active:scale-[0.98] transition-all disabled:opacity-50"
             >
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -106,10 +107,10 @@ export default function ComplaintActions({ complaintId, status, isAdmin }: Compl
 
       {/* REJECT MODAL — scrim gets blur, panel stays solid */}
       {showRejectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-solid/40 backdrop-blur-sm p-4 animate-in fade-in duration-150">
-          <div className="w-full max-w-md rounded-3xl border border-border bg-surface shadow-2xl p-7 animate-in zoom-in-95 duration-150">
-            <h3 className="text-lg font-semibold text-primary tracking-tight">Reject Resolution</h3>
-            <p className="mt-1 text-sm text-secondary leading-relaxed">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 animate-in fade-in duration-150">
+          <div className="w-full max-w-md rounded-3xl border border-border bg-card shadow-2xl p-7 animate-in zoom-in-95 duration-150">
+            <h3 className="text-lg font-semibold text-foreground tracking-tight">Reject Resolution</h3>
+            <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
               Provide feedback on why this fix was rejected.
             </p>
 
@@ -120,14 +121,14 @@ export default function ComplaintActions({ complaintId, status, isAdmin }: Compl
                 onChange={(e) => setRejectionNote(e.target.value)}
                 placeholder="e.g. Area is still dirty, pipe is still leaking..."
                 rows={4}
-                className="w-full rounded-2xl border border-border bg-surface px-4 py-3 text-sm text-primary outline-none placeholder:text-muted focus:border-accent focus:ring-2 focus:ring-accent/20 resize-none"
+                className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20 resize-none"
               />
 
               <div className="flex gap-3 justify-end pt-2">
                 <button
                   type="button"
                   onClick={() => setShowRejectModal(false)}
-                  className="rounded-full border border-border bg-surface px-5 py-2.5 text-xs font-semibold text-secondary shadow-sm hover:bg-surface-muted active:scale-[0.98] transition-all"
+                  className="rounded-full border border-border bg-card px-5 py-2.5 text-xs font-semibold text-muted-foreground shadow-sm hover:bg-muted active:scale-[0.98] transition-all"
                 >
                   Cancel
                 </button>

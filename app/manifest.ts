@@ -2,8 +2,8 @@ import { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Facility Portal',
-    short_name: 'Facility Portal',
+    name: 'FacilityOS',
+    short_name: 'FacilityOS',
     description: 'A comprehensive facility management application for tracking tasks, attendance, and complaints.',
     start_url: '/',
     display: 'standalone',

@@ -7,7 +7,9 @@ import type { UserRole } from '@/types/database'
  */
 export const ROLE_HOME: Record<UserRole, string> = {
   super_admin: '/admin',
+  system_executive: '/portal',
   local_admin: '/admin',
   cleaner: '/tasks',
+  housekeeper: '/tasks',
   employee: '/portal',
 }

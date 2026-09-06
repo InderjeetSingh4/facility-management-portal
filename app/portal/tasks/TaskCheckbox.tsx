@@ -2,6 +2,7 @@
 
 import { useTransition } from 'react'
 import { toggleTaskCompletion } from '../actions'
+import { toast } from 'sonner'
 
 export default function TaskCheckbox({
   taskId,
@@ -19,7 +20,12 @@ export default function TaskCheckbox({
       aria-pressed={isCompleted}
       aria-label={isCompleted ? 'Mark as incomplete' : 'Mark as complete'}
       disabled={isPending}
-      onClick={() => startTransition(() => toggleTaskCompletion(taskId))}
+      onClick={() => startTransition(async () => {
+        const res = await toggleTaskCompletion(taskId)
+        if (res && (res as any).error) {
+          toast.error((res as any).error)
+        }
+      })}
       className={`
         relative flex h-8 w-8 flex-shrink-0 items-center justify-center
         rounded-xl border-2 transition-all duration-200

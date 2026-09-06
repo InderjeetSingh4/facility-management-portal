@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { bookRoom } from '../actions'
 import { toast } from 'sonner'
+import { Calendar, Clock } from 'lucide-react'
 
 export default function BookingForm({ rooms }: { rooms: any[] }) {
   const formRef = useRef<HTMLFormElement>(null)
@@ -32,35 +33,38 @@ export default function BookingForm({ rooms }: { rooms: any[] }) {
   // Generate today's date in local YYYY-MM-DD format for default value
   const todayDate = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date())
 
-  const inputClasses = "block w-full appearance-none rounded-[10px] border border-transparent bg-black/5 dark:bg-bg-surface-raised p-4 text-primary dark:text-text-primary outline-none transition-all placeholder:text-muted dark:placeholder:text-text-muted focus:border-dashed focus:border-accent"
+  const inputClasses = "block w-full rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground placeholder:text-muted-foreground outline-none transition-all focus:border-primary focus:bg-muted cursor-pointer [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:w-full [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:right-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer"
+  const labelClasses = "mb-1.5 block text-[11px] font-mono font-bold uppercase tracking-[0.12em] text-muted-foreground"
 
   return (
-    <form ref={formRef} action={handleSubmit} className="space-y-4">
+    <form ref={formRef} action={handleSubmit} className="space-y-5">
       {error && (
-        <div className="rounded-xl border border-neutral-300/50 bg-neutral-100/60 px-4 py-2.5 text-sm text-neutral-600 dark:border-neutral-700/50 dark:bg-neutral-800/40 dark:text-neutral-400">
+        <div className="rounded-xl border border-danger bg-danger-bg px-4 py-3 text-xs font-semibold text-danger">
           {error}
         </div>
       )}
 
       <div>
-        <label htmlFor="room_id" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-secondary">
-          Select Room
+        <label htmlFor="room_id" className={labelClasses}>
+          Conference Room
         </label>
         <select
           id="room_id"
           name="room_id"
           required
-          className={inputClasses}
+          className={`${inputClasses} cursor-pointer`}
         >
-          <option value="">-- Choose a room --</option>
+          <option value="" className="text-muted-foreground">Select a room...</option>
           {rooms.map(room => (
-            <option key={room.id} value={room.id}>{room.name} (Capacity: {room.capacity})</option>
+            <option key={room.id} value={room.id} className="text-foreground bg-card">
+              {room.name} (Cap: {room.capacity || 10})
+            </option>
           ))}
         </select>
       </div>
 
       <div>
-        <label htmlFor="title" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-secondary">
+        <label htmlFor="title" className={labelClasses}>
           Meeting Title
         </label>
         <input
@@ -68,79 +72,92 @@ export default function BookingForm({ rooms }: { rooms: any[] }) {
           name="title"
           type="text"
           required
-          placeholder="e.g. Q3 Marketing Sync"
+          placeholder="e.g. Executive Sync"
           className={inputClasses}
         />
       </div>
 
       <div>
-        <label htmlFor="booking_date" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-secondary">
-          Date
+        <label htmlFor="booking_date" className={labelClasses}>
+          Reservation Date
         </label>
-        <div className={inputClasses.replace('p-4', 'p-0') + " flex items-center overflow-hidden"}>
+        <div className="relative flex items-center">
           <input
             id="booking_date"
             name="booking_date"
             type="date"
             required
             defaultValue={todayDate}
-            className="w-full h-full bg-transparent p-4 outline-none appearance-none cursor-pointer"
+            className={`${inputClasses} pr-10`}
           />
+          <Calendar size={18} className="absolute right-3.5 pointer-events-none text-foreground stroke-[2]" />
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label htmlFor="start_time" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-secondary">
+          <label htmlFor="start_time" className={labelClasses}>
             Start Time
           </label>
-          <div className={inputClasses.replace('p-4', 'p-0') + " flex items-center overflow-hidden"}>
+          <div className="relative flex items-center">
             <input
               id="start_time"
               name="start_time"
               type="time"
               required
-              className="w-full h-full bg-transparent p-4 outline-none appearance-none cursor-pointer"
+              className={`${inputClasses} pr-10`}
             />
+            <Clock size={18} className="absolute right-3.5 pointer-events-none text-foreground stroke-[2]" />
           </div>
         </div>
         <div>
-          <label htmlFor="end_time" className="mb-1.5 block text-xs font-bold uppercase tracking-wider text-secondary">
+          <label htmlFor="end_time" className={labelClasses}>
             End Time
           </label>
-          <div className={inputClasses.replace('p-4', 'p-0') + " flex items-center overflow-hidden"}>
+          <div className="relative flex items-center">
             <input
               id="end_time"
               name="end_time"
               type="time"
               required
-              className="w-full h-full bg-transparent p-4 outline-none appearance-none cursor-pointer"
+              className={`${inputClasses} pr-10`}
             />
+            <Clock size={18} className="absolute right-3.5 pointer-events-none text-foreground stroke-[2]" />
           </div>
         </div>
       </div>
 
       <div>
-        <label className="mb-2 block text-xs font-bold uppercase tracking-wider text-secondary">
+        <label className={labelClasses}>
           Prep Requirements (Optional)
         </label>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2.5">
           {['Water Bottles', 'Notepads & Pens', 'Snacks/Biscuits'].map((item) => (
-            <label key={item} className="flex cursor-pointer items-center gap-2 border border-transparent bg-black/5 dark:bg-bg-surface-raised text-secondary dark:text-text-muted rounded-[10px] px-4 py-2 text-sm font-medium transition-all hover:bg-black/10 dark:hover:bg-bg-surface-raised/80">
-              <input type="checkbox" name="prep_items" value={item} className="h-4 w-4 rounded border-transparent bg-white dark:bg-bg-surface text-accent focus:ring-0 outline-none" />
-              {item}
+            <label
+              key={item}
+              className="flex cursor-pointer items-center gap-2.5 rounded-xl border border-border bg-card px-3.5 py-2.5 text-xs font-semibold text-foreground transition-all hover:border-primary active:scale-[0.98]"
+            >
+              <input
+                type="checkbox"
+                name="prep_items"
+                value={item}
+                className="h-4 w-4 rounded border-border text-primary accent-primary focus:ring-0 cursor-pointer"
+              />
+              <span>{item}</span>
             </label>
           ))}
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white focus:ring-2 focus:ring-indigo-500/40 font-bold py-3.5 px-4 rounded-xl transition-all shadow-md shadow-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        {isSubmitting ? 'Booking…' : 'Book Room'}
-      </button>
+      <div className="pt-3 border-t border-border flex justify-end gap-3">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3.5 px-6 text-sm rounded-xl transition-all active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-50 tracking-wide"
+        >
+          {isSubmitting ? 'Confirming…' : 'Confirm Booking'}
+        </button>
+      </div>
     </form>
   )
 }

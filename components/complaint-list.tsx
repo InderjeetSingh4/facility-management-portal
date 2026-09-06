@@ -37,24 +37,24 @@ export default function ComplaintList({ initialComplaints }) {
             placeholder="Search titles or details..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-2xl border border-border bg-surface py-3 pl-11 pr-4 text-sm text-primary placeholder:text-muted outline-none backdrop-blur-2xl transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+            className="w-full rounded-2xl border border-border bg-card py-3 pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground outline-none backdrop-blur-2xl transition focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
         </div>
 
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="shrink-0 rounded-2xl border border-border bg-surface-solid/80 px-4 py-3 text-sm text-primary outline-none backdrop-blur-2xl transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 sm:w-48"
+          className="shrink-0 rounded-2xl border border-border bg-card px-4 py-3 text-sm text-foreground outline-none backdrop-blur-2xl transition focus:border-primary focus:ring-2 focus:ring-primary/20 sm:w-48"
         >
-          <option value="all" className="bg-surface-solid text-primary">All Complaints</option>
-          <option value="open" className="bg-surface-solid text-primary">Action Required</option>
-          <option value="resolved" className="bg-surface-solid text-primary">Resolved</option>
+          <option value="all" className="bg-card text-foreground">All Complaints</option>
+          <option value="open" className="bg-card text-foreground">Action Required</option>
+          <option value="resolved" className="bg-card text-foreground">Resolved</option>
         </select>
       </div>
 
       {/* Results or Empty State */}
       {filteredComplaints.length === 0 ? (
-        <div className="bg-surface backdrop-blur-2xl border border-border rounded-2xl shadow-xl p-6 text-center text-sm text-muted">
+        <div className="bg-card backdrop-blur-2xl border border-border rounded-2xl shadow-xl p-6 text-center text-sm text-muted-foreground">
           No complaints found matching your search.
         </div>
       ) : (

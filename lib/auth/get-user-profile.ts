@@ -22,17 +22,24 @@ export interface UserProfile {
 export async function getUserProfile(): Promise<UserProfile | null> {
   const supabase = await createClient()
 
-  const { data: claimsData } = await supabase.auth.getClaims()
-  const userId = claimsData?.claims?.sub
-  if (!userId) return null
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
+  if (userError || !user) return null
 
   const { data: profile, error } = await supabase
     .from('users')
     .select('id, role, plant_id, full_name, approval_status')
-    .eq('id', userId)
+    .eq('id', user.id)
     .single()
 
-  if (error || !profile) return null
+  if (error || !profile) {
+    return {
+      id: user.id,
+      role: (user.user_metadata?.role as UserRole) || 'employee',
+      plantId: (user.app_metadata?.plant_id as string) || (user.user_metadata?.plant_id as string) || null,
+      fullName: (user.user_metadata?.full_name as string) || user.email?.split('@')[0] || 'User',
+      approvalStatus: (user.app_metadata?.approval_status as string) || 'pending',
+    }
+  }
 
   return {
     id: profile.id,

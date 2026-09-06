@@ -11,31 +11,32 @@ export default function AnalyticsChart({ data }: { data: any[] }) {
             dataKey="name" 
             axisLine={false}
             tickLine={false}
-            tick={{ fontSize: 12, fill: '#888' }}
+            tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
             dy={10}
           />
           <YAxis 
             axisLine={false}
             tickLine={false}
-            tick={{ fontSize: 12, fill: '#888' }}
+            tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
             allowDecimals={false}
           />
           <Tooltip 
-            cursor={{ fill: 'rgba(0,0,0,0.04)' }}
+            cursor={{ fill: 'rgba(255,255,255,0.03)' }}
             contentStyle={{
-              backgroundColor: 'rgba(255,255,255,0.7)',
-              backdropFilter: 'blur(12px)',
+              backgroundColor: 'var(--card)',
+              backdropFilter: 'blur(16px)',
               borderRadius: '12px',
-              border: '1px solid rgba(255,255,255,0.5)',
-              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
-              color: '#333'
+              border: '1px solid var(--border)',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)',
+              color: 'var(--foreground)'
             }}
-            itemStyle={{ color: '#10b981', fontWeight: 600 }}
+            itemStyle={{ color: 'var(--foreground)', fontWeight: 600 }}
           />
           <Bar 
             dataKey="completions" 
             name="Completed Tasks"
-            fill="#10b981" 
+            fill="var(--foreground)"
+            fillOpacity={0.8}
             radius={[6, 6, 0, 0]} 
             maxBarSize={60}
           />

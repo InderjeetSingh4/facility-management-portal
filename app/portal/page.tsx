@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { deleteNotice } from './actions'
+import { deleteNotice, getExecutiveMetrics } from './actions'
 import Image from 'next/image'
 import { Suspense } from 'react'
 import PageHeader from '@/components/PageHeader'
@@ -8,6 +8,8 @@ import WeeklyReportButton from '@/components/WeeklyReportButton'
 import SkeletonCard from '@/components/ui/SkeletonCard'
 import GlassCard from '@/components/ui/GlassCard'
 import AttendanceWidget from '@/components/AttendanceWidget'
+import ExecutiveDashboardView from '@/components/ExecutiveDashboardView'
+import { isSystemExecutive, isAdmin as checkIsAdmin, isCleaner as checkIsCleaner, formatRoleName } from '@/lib/auth/rbac'
 import { Plus, Trash2, TrendingUp, ClipboardList, BellRing } from 'lucide-react'
 
 function ProgressRing({
@@ -83,66 +85,66 @@ async function DashboardStatsAndNotices({ plantId, isAdmin, isCleaner, userId }:
       )}
 
       {/* ── Stat Cards Grid ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6 mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-5 mt-4">
         {/* Tasks Today */}
-        <GlassCard interactive className="p-8 flex flex-col justify-between min-h-[160px]">
-          <div className="flex items-center justify-between mb-4">
-            <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">Tasks Today</p>
+        <GlassCard interactive className="p-5 sm:p-6 flex flex-col justify-between min-h-[140px]">
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase text-muted dark:text-text-muted">Tasks Today</p>
           </div>
           <div>
-            <p className="font-mono text-5xl font-bold text-primary dark:text-text-primary tracking-tighter">{totalToday}</p>
+            <p className="font-mono text-3xl sm:text-4xl font-extrabold text-primary dark:text-text-primary tracking-tight">{totalToday}</p>
             {totalToday === 0 ? (
-              <p className="mt-2 text-[13px] text-muted dark:text-text-muted font-medium">You're all caught up for today!</p>
+              <p className="mt-1.5 text-xs text-muted dark:text-text-muted font-medium">You're all caught up for today!</p>
             ) : (
-              <p className="mt-2 text-[13px] text-muted dark:text-text-muted font-medium">checklist items</p>
+              <p className="mt-1.5 text-xs text-muted dark:text-text-muted font-medium">checklist items</p>
             )}
           </div>
         </GlassCard>
 
         {/* Completed */}
-        <GlassCard interactive className="p-8 flex flex-col justify-between min-h-[160px]">
-          <div className="flex items-center justify-between mb-4">
-            <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">Completed</p>
+        <GlassCard interactive className="p-5 sm:p-6 flex flex-col justify-between min-h-[140px]">
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase text-muted dark:text-text-muted">Completed</p>
           </div>
           <div>
-            <p className="font-mono text-5xl font-bold text-primary dark:text-text-primary tracking-tighter">{completedToday}</p>
+            <p className="font-mono text-3xl sm:text-4xl font-extrabold text-primary dark:text-text-primary tracking-tight">{completedToday}</p>
             {totalToday === 0 ? (
-              <p className="mt-2 text-[13px] text-muted dark:text-text-muted font-medium">No tasks to complete yet.</p>
+              <p className="mt-1.5 text-xs text-muted dark:text-text-muted font-medium">No tasks to complete yet.</p>
             ) : (
-              <p className="mt-2 text-[13px] text-muted dark:text-text-muted font-medium">of {totalToday} tasks</p>
+              <p className="mt-1.5 text-xs text-muted dark:text-text-muted font-medium">of {totalToday} tasks</p>
             )}
           </div>
         </GlassCard>
 
         {/* Active Notices */}
-        <GlassCard interactive className="p-8 flex flex-col justify-between min-h-[160px]">
-          <div className="flex items-center justify-between mb-4">
-            <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">Active Notices</p>
+        <GlassCard interactive className="p-5 sm:p-6 flex flex-col justify-between min-h-[140px]">
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase text-muted dark:text-text-muted">Active Notices</p>
           </div>
           <div>
-            <p className="font-mono text-5xl font-bold text-primary dark:text-text-primary tracking-tighter">{notices?.length || 0}</p>
+            <p className="font-mono text-3xl sm:text-4xl font-extrabold text-primary dark:text-text-primary tracking-tight">{notices?.length || 0}</p>
             {notices?.length === 0 ? (
-              <p className="mt-2 text-[13px] text-muted dark:text-text-muted font-medium">No active notices on the board.</p>
+              <p className="mt-1.5 text-xs text-muted dark:text-text-muted font-medium">No active notices on the board.</p>
             ) : (
-              <p className="mt-2 text-[13px] text-muted dark:text-text-muted font-medium">currently on the board</p>
+              <p className="mt-1.5 text-xs text-muted dark:text-text-muted font-medium">currently on the board</p>
             )}
           </div>
         </GlassCard>
 
         {/* Progress Ring */}
-        <GlassCard interactive className="p-8 flex flex-col justify-between min-h-[160px]">
-          <div className="flex items-center justify-between mb-4">
-            <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">Progress</p>
+        <GlassCard interactive className="p-5 sm:p-6 flex flex-col justify-between min-h-[140px]">
+          <div className="flex items-center justify-between mb-2">
+            <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase text-muted dark:text-text-muted">Progress</p>
           </div>
-          <div className="flex items-center gap-5 mt-auto">
+          <div className="flex items-center gap-4 mt-auto">
             <div className="relative flex-shrink-0">
-              <ProgressRing value={completedToday} max={totalToday} size={64} stroke={5} />
+              <ProgressRing value={completedToday} max={totalToday} size={56} stroke={4} />
             </div>
             <div>
-              <p className="text-2xl font-bold text-primary dark:text-text-primary tracking-tight">
-                {completedToday}<span className="text-muted dark:text-text-muted text-lg font-medium">/{totalToday}</span>
+              <p className="text-xl font-bold text-primary dark:text-text-primary tracking-tight">
+                {completedToday}<span className="text-muted dark:text-text-muted text-base font-medium">/{totalToday}</span>
               </p>
-              <Link href="/portal/tasks" className="mt-1 inline-block text-[13px] text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 font-semibold transition-colors">
+              <Link href="/portal/tasks" className="mt-0.5 inline-block text-xs text-[var(--text-primary)] hover:underline hover:text-[var(--text-primary)] font-medium transition-colors">
                 View checklist →
               </Link>
             </div>
@@ -152,18 +154,18 @@ async function DashboardStatsAndNotices({ plantId, isAdmin, isCleaner, userId }:
 
       {/* ── Progress Bar ── */}
       {totalToday > 0 && (
-        <GlassCard className="p-8 mt-8">
-          <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm font-semibold text-primary">Daily Completion Rate</p>
-            <p className="text-sm font-bold text-primary">{pct}%</p>
+        <GlassCard className="p-5 sm:p-6 mt-6">
+          <div className="mb-2.5 flex items-center justify-between">
+            <p className="text-xs sm:text-sm font-semibold text-primary">Daily Completion Rate</p>
+            <p className="text-xs sm:text-sm font-bold text-primary">{pct}%</p>
           </div>
           <div className="h-2 w-full overflow-hidden rounded-full bg-black/5 dark:bg-white/10">
             <div
-              className="h-full rounded-full bg-blue-500 transition-all duration-1000 ease-out"
+              className="h-full rounded-full bg-gradient-to-r from-accent-dim to-accent transition-all duration-1000 ease-out"
               style={{ width: `${pct}%` }}
             />
           </div>
-          <p className="mt-4 text-[13px] text-muted font-medium">
+          <p className="mt-3 text-xs text-muted font-medium">
             {completedToday === totalToday && totalToday > 0
               ? '🎉 All tasks completed for today.'
               : `${totalToday - completedToday} task${totalToday - completedToday !== 1 ? 's' : ''} remaining`}
@@ -172,19 +174,19 @@ async function DashboardStatsAndNotices({ plantId, isAdmin, isCleaner, userId }:
       )}
 
       {/* ── Digital Noticeboard ── */}
-      <GlassCard className="mt-8 overflow-hidden !p-0">
-        <div className="px-6 py-5 border-b border-white/40 dark:border-border-hairline flex items-center justify-between">
-          <h2 className="text-lg font-heading font-bold text-primary dark:text-text-primary tracking-tight">Noticeboard</h2>
+      <GlassCard className="mt-6 overflow-hidden !p-0">
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+          <h2 className="text-base font-heading font-bold text-primary dark:text-text-primary tracking-tight">Noticeboard</h2>
         </div>
 
-        <div className="p-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="p-5 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {notices?.map((notice: any) => (
             <div
               key={notice.id}
-              className="relative overflow-hidden bg-white dark:bg-bg-surface border border-white/80 dark:border-transparent rounded-[14px] p-6 shadow-sm dark:shadow-none hover:shadow-md dark:hover:bg-bg-surface-raised active:scale-95 transition-all duration-300 cursor-pointer flex flex-col h-full"
+              className="relative overflow-hidden bg-card border border-border rounded-xl p-5 shadow-sm hover:shadow-md hover:bg-muted active:scale-95 transition-all duration-300 cursor-pointer flex flex-col h-full"
             >
               {notice.image_url && (
-                <div className="relative w-full aspect-[4/3] overflow-hidden rounded-[14px] border border-black/5 dark:border-transparent dark:bg-bg-surface-raised mb-4 -mx-1">
+                <div className="relative w-full aspect-[16/9] overflow-hidden rounded-lg border border-border bg-muted mb-3">
                   <Image
                     src={notice.image_url}
                     alt={notice.title}
@@ -193,27 +195,27 @@ async function DashboardStatsAndNotices({ plantId, isAdmin, isCleaner, userId }:
                   />
                 </div>
               )}
-              <div className="flex flex-col flex-1 justify-between gap-4">
+              <div className="flex flex-col flex-1 justify-between gap-3">
                 <div>
-                  <div className="flex justify-between items-start gap-3">
-                    <h4 className="text-base font-bold text-primary dark:text-text-primary tracking-tight">{notice.title}</h4>
+                  <div className="flex justify-between items-start gap-2">
+                    <h4 className="text-sm sm:text-base font-bold text-primary dark:text-text-primary tracking-tight">{notice.title}</h4>
                     {isAdmin && (
                       <form action={deleteNotice.bind(null, notice.id)}>
                         <button
                           type="submit"
-                          className="flex-shrink-0 rounded-full p-2 text-muted hover:bg-red-500/10 hover:text-red-500 active:scale-95 transition-all duration-200 -mt-1 -mr-1"
+                          className="flex-shrink-0 rounded-full p-1.5 text-muted hover:bg-red-500/10 hover:text-red-500 active:scale-95 transition-all duration-200 -mt-1 -mr-1"
                           title="Delete Notice"
                         >
-                          <Trash2 size={16} />
+                          <Trash2 size={15} />
                         </button>
                       </form>
                     )}
                   </div>
-                  <p className="mt-2 text-[13px] text-muted dark:text-text-muted leading-relaxed font-medium line-clamp-3">
+                  <p className="mt-1.5 text-xs text-muted dark:text-text-muted leading-relaxed font-medium line-clamp-3">
                     {notice.content ?? notice.details}
                   </p>
                 </div>
-                <p className="text-[11px] font-mono uppercase tracking-widest text-muted dark:text-text-muted mt-2 pt-4 border-t border-black/5 dark:border-border-hairline">
+                <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mt-2 pt-3 border-t border-border">
                   {notice.author_name ? `${notice.author_name} · ` : ''}
                   {new Date(notice.created_at).toLocaleDateString('en-IN', {
                     day: 'numeric', month: 'short', year: 'numeric',
@@ -227,19 +229,19 @@ async function DashboardStatsAndNotices({ plantId, isAdmin, isCleaner, userId }:
           {isAdmin && (
             <Link
               href="/portal/new-notice"
-              className="relative overflow-hidden bg-white/20 dark:bg-bg-surface border border-dashed border-gray-300 dark:border-border-dashed rounded-[14px] p-6 hover:bg-white/40 dark:hover:bg-bg-surface-raised transition-all duration-300 cursor-pointer flex flex-col items-center justify-center text-center min-h-[220px]"
+              className="relative overflow-hidden bg-card border border-dashed border-border rounded-xl p-5 hover:bg-muted transition-all duration-300 cursor-pointer flex flex-col items-center justify-center text-center min-h-[180px]"
             >
-              <div className="h-12 w-12 rounded-full bg-[#3b82f6]/10 dark:bg-bg-surface-raised flex items-center justify-center mb-4">
-                <Plus size={24} className="text-[#3b82f6] dark:text-accent" />
+              <div className="h-10 w-10 rounded-full bg-[var(--accent-solid)] dark:bg-bg-surface-raised flex items-center justify-center mb-3">
+                <Plus size={20} className="text-[var(--accent-solid-text)] dark:text-accent" />
               </div>
-              <h4 className="text-sm font-bold text-primary dark:text-text-primary">Add New Notice</h4>
-              <p className="mt-1 text-[13px] font-medium text-muted dark:text-text-muted">Post a new update for the team</p>
+              <h4 className="text-xs sm:text-sm font-bold text-primary dark:text-text-primary">Add New Notice</h4>
+              <p className="mt-0.5 text-xs font-medium text-muted dark:text-text-muted">Post a new update for the team</p>
             </Link>
           )}
 
           {!isAdmin && notices?.length === 0 && (
-            <div className="col-span-full rounded-[14px] border border-dashed border-gray-300 dark:border-border-dashed p-16 text-center bg-white/20 dark:bg-bg-surface">
-              <p className="text-sm font-bold text-muted dark:text-text-muted">No notices have been posted yet.</p>
+            <div className="col-span-full rounded-xl border border-dashed border-border p-12 text-center bg-card">
+              <p className="text-xs font-bold text-muted dark:text-text-muted">No notices have been posted yet.</p>
             </div>
           )}
         </div>
@@ -264,29 +266,56 @@ function DashboardSkeleton() {
 
 export default async function PortalDashboard() {
   const supabase = await createClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  const user = session?.user
+  const { data: { user } } = await supabase.auth.getUser()
 
-  const email = user?.email || 'User'
-  const role = user?.user_metadata?.role || 'staff'
-  const formattedRole = role.replace('_', ' ').replace(/\b\w/g, (char: string) => char.toUpperCase())
-  const isAdmin = role === 'local_admin' || role === 'super_admin'
-  const isCleaner = role === 'cleaner' || role === 'housekeeper'
-  let plantId = user?.app_metadata?.plant_id
-  let fullName = user?.user_metadata?.full_name
-
-  if (user?.id) {
-    const { data: profile } = await supabase.from('users').select('plant_id, full_name').eq('id', user.id).single()
-    if (!plantId) plantId = profile?.plant_id
-    fullName = profile?.full_name || fullName || email.split('@')[0]
-  } else {
-    fullName = fullName || email.split('@')[0]
+  if (!user) {
+    return <div className="p-8 text-center text-sm text-muted-foreground">Please sign in to view this dashboard.</div>
   }
+
+  const { data: profile } = await supabase
+    .from('users')
+    .select('id, role, plant_id, full_name')
+    .eq('id', user.id)
+    .single()
+
+  const email = user.email || 'User'
+  const role = profile?.role || user.user_metadata?.role || 'staff'
+  const formattedRole = formatRoleName(role)
+  const isExecutive = isSystemExecutive(role)
+  const isAdmin = checkIsAdmin(role)
+  const isCleaner = checkIsCleaner(role)
+  const plantId = profile?.plant_id || user.app_metadata?.plant_id
+  const fullName = profile?.full_name || user.user_metadata?.full_name || email.split('@')[0]
 
   const today = new Date().toLocaleDateString('en-IN', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   })
 
+  // 👑 System Executive View
+  if (isExecutive) {
+    const [metrics, { data: notices }] = await Promise.all([
+      getExecutiveMetrics(),
+      supabase.from('notices').select('*').order('created_at', { ascending: false })
+    ])
+
+    return (
+      <div className="space-y-6">
+        <PageHeader
+          title={`Executive Overview — ${fullName}`}
+          description={`${today} · Oversight & Management Dashboard`}
+          action={<WeeklyReportButton />}
+        />
+
+        {plantId ? (
+          <ExecutiveDashboardView metrics={metrics} notices={notices || []} />
+        ) : (
+          <div className="mt-6 text-sm text-muted">No facility assigned.</div>
+        )}
+      </div>
+    )
+  }
+
+  // 🛠️ Operational View (Facility Manager & Housekeeping/Staff)
   return (
     <div>
       <PageHeader
@@ -297,7 +326,7 @@ export default async function PortalDashboard() {
 
       {plantId ? (
         <Suspense fallback={<DashboardSkeleton />}>
-          <DashboardStatsAndNotices plantId={plantId} isAdmin={isAdmin} isCleaner={isCleaner} userId={user?.id || ''} />
+          <DashboardStatsAndNotices plantId={plantId} isAdmin={isAdmin} isCleaner={isCleaner} userId={user.id} />
         </Suspense>
       ) : (
         <div className="mt-6 text-sm text-muted">No facility assigned.</div>

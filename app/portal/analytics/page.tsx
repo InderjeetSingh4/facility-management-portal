@@ -14,7 +14,7 @@ async function AnalyticsContent() {
   if (!analytics) {
     return (
       <div className="rounded-xl border border-dashed border-border bg-surface-muted p-12 text-center mt-6">
-        <p className="text-sm text-secondary">No data available for your facility.</p>
+        <p className="text-sm text-muted-foreground">No data available for your facility.</p>
       </div>
     )
   }
@@ -22,50 +22,50 @@ async function AnalyticsContent() {
   return (
     <>
       {/* ── Top Stats Cards ── */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 mt-8">
-        <div className="bg-white dark:bg-bg-surface border-t-2 border-t-accent rounded-[14px] p-7 shadow-sm dark:shadow-none hover:shadow-md dark:hover:bg-bg-surface-raised transition-shadow min-h-[160px] flex flex-col justify-center">
-          <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mt-6">
+        <div className="bg-card border border-border border-t-2 border-t-[var(--accent)] rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow min-h-[140px] flex flex-col justify-center">
+          <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase text-muted-foreground">
             Tasks Completed (7d)
           </p>
-          <p className="mt-3 font-mono text-5xl font-bold text-primary dark:text-text-primary tracking-tight">
+          <p className="mt-2 font-mono text-3xl sm:text-4xl font-extrabold text-foreground tracking-tight">
             {analytics.totalCompletedTasks}
           </p>
         </div>
-        <div className="bg-white dark:bg-bg-surface border-t-2 border-t-accent-dim rounded-[14px] p-7 shadow-sm dark:shadow-none hover:shadow-md dark:hover:bg-bg-surface-raised transition-shadow min-h-[160px] flex flex-col justify-center">
-          <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">
+        <div className="bg-card border border-border border-t-2 border-t-[var(--accent-dim)] rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow min-h-[140px] flex flex-col justify-center">
+          <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase text-muted-foreground">
             Open Complaints
           </p>
-          <p className="mt-3 font-mono text-5xl font-bold text-warning tracking-tight">
+          <p className="mt-2 font-mono text-3xl sm:text-4xl font-extrabold text-warning tracking-tight">
             {analytics.openComplaints}
           </p>
         </div>
-        <div className="bg-white dark:bg-bg-surface border-t-2 border-t-accent-dim rounded-[14px] p-7 shadow-sm dark:shadow-none hover:shadow-md dark:hover:bg-bg-surface-raised transition-shadow min-h-[160px] flex flex-col justify-center">
-          <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">
+        <div className="bg-card border border-border border-t-2 border-t-[var(--accent-dim)] rounded-2xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-shadow min-h-[140px] flex flex-col justify-center">
+          <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase text-muted-foreground">
             Resolved Complaints
           </p>
-          <p className="mt-3 font-mono text-5xl font-bold text-success tracking-tight">
+          <p className="mt-2 font-mono text-3xl sm:text-4xl font-extrabold text-success tracking-tight">
             {analytics.resolvedComplaints}
           </p>
         </div>
       </div>
 
       {/* ── Recharts Bar Chart ── */}
-      <div className="bg-white dark:bg-bg-surface rounded-[14px] p-7 shadow-sm dark:shadow-none mt-6">
-        <h2 className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted mb-4">
+      <div className="bg-card border border-border rounded-2xl p-7 shadow-sm mt-6">
+        <h2 className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase text-muted-foreground mb-4">
           Daily Task Completions
         </h2>
         <AnalyticsChart data={analytics.chartData} />
       </div>
 
       {/* ── Attendance Log ── */}
-      <div className="mt-6 bg-white dark:bg-bg-surface rounded-[14px] shadow-sm dark:shadow-none overflow-hidden">
-        <div className="px-7 py-5 border-b border-black/5 dark:border-border-dashed">
-          <h2 className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">
+      <div className="mt-6 bg-card border border-border rounded-2xl shadow-sm overflow-hidden">
+        <div className="px-7 py-5 border-b border-border">
+          <h2 className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase text-muted-foreground">
             Today's Attendance Log
           </h2>
         </div>
         <Suspense fallback={
-          <div className="p-8 text-center text-sm text-secondary">Loading logs...</div>
+          <div className="p-8 text-center text-sm text-muted-foreground">Loading logs...</div>
         }>
           <AttendanceLogContent />
         </Suspense>
@@ -95,7 +95,7 @@ async function AttendanceLogContent() {
 
   if (error || !logs || logs.length === 0) {
     return (
-      <div className="p-10 text-center text-sm text-secondary">
+      <div className="p-10 text-center text-sm text-muted-foreground">
         No attendance records found for today.
       </div>
     )
@@ -104,15 +104,15 @@ async function AttendanceLogContent() {
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-left text-sm whitespace-nowrap">
-        <thead className="bg-black/5 dark:bg-transparent border-b border-black/5 dark:border-border-dashed">
+        <thead className="bg-muted dark:bg-transparent border-b border-border">
           <tr>
-            <th className="px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">Time (In/Out)</th>
-            <th className="px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">Staff Member</th>
-            <th className="px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">Status</th>
-            <th className="px-5 py-3 font-mono text-[10px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">Distance</th>
+            <th className="px-5 py-3 font-mono text-[10px] font-semibold uppercase text-muted-foreground">Time (In/Out)</th>
+            <th className="px-5 py-3 font-mono text-[10px] font-semibold uppercase text-muted-foreground">Staff Member</th>
+            <th className="px-5 py-3 font-mono text-[10px] font-semibold uppercase text-muted-foreground">Status</th>
+            <th className="px-5 py-3 font-mono text-[10px] font-semibold uppercase text-muted-foreground">Distance</th>
           </tr>
         </thead>
-        <tbody className="divide-y divide-black/5 dark:divide-border-dashed">
+        <tbody className="divide-y divide-border">
           {logs.map((log: any) => {
             const isPresent = log.status === 'present'
             const inTime = new Date(log.created_at).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
@@ -121,17 +121,17 @@ async function AttendanceLogContent() {
             const userRole = log.users?.role || 'staff'
 
             return (
-              <tr key={log.id} className="hover:bg-black/5 dark:hover:bg-bg-surface-raised transition-colors">
+              <tr key={log.id} className="hover:bg-muted transition-colors">
                 <td className="px-5 py-3.5">
                   <div className="flex flex-col font-mono">
-                    <span className="font-bold text-primary dark:text-text-primary">{inTime}</span>
-                    {outTime && <span className="text-xs text-muted dark:text-text-muted mt-0.5">Out: {outTime}</span>}
+                    <span className="font-bold text-foreground">{inTime}</span>
+                    {outTime && <span className="text-xs text-muted-foreground mt-0.5">Out: {outTime}</span>}
                   </div>
                 </td>
                 <td className="px-5 py-3.5">
                   <div className="flex flex-col">
-                    <span className="font-semibold text-primary dark:text-text-primary">{userName}</span>
-                    <span className="text-xs font-medium text-muted dark:text-text-muted mt-0.5 capitalize">{userRole.replace('_', ' ')}</span>
+                    <span className="font-semibold text-foreground">{userName}</span>
+                    <span className="text-xs font-medium text-muted-foreground mt-0.5 capitalize">{userRole.replace('_', ' ')}</span>
                   </div>
                 </td>
                 <td className="px-5 py-3.5">
@@ -143,7 +143,7 @@ async function AttendanceLogContent() {
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-danger bg-transparent px-2.5 py-1 text-[11px] font-semibold text-danger"><span className="h-1.5 w-1.5 rounded-full bg-danger" />Out of Range</span>
                   )}
                 </td>
-                <td className="px-5 py-3.5 text-sm font-mono text-muted dark:text-text-muted">
+                <td className="px-5 py-3.5 text-sm font-mono text-muted-foreground">
                   {log.distance_from_plant_meters}m
                 </td>
               </tr>

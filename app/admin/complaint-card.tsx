@@ -13,17 +13,17 @@ interface ComplaintCardProps {
 }
 
 const STATUS_LABELS: Record<ComplaintStatus, string> = {
-  open: 'Open',
-  pending_approval: 'Pending Approval',
-  approved: 'Approved',
-  rejected: 'Rejected',
+  pending: 'Pending',
+  reviewed: 'Reviewed',
+  resolved: 'Resolved',
+  dismissed: 'Dismissed',
 }
 
 const STATUS_STYLES: Record<ComplaintStatus, string> = {
-  open: 'bg-surface-muted/60 text-primary border border-border',
-  pending_approval: 'bg-amber-500/20 text-amber-300 border border-amber-500/30',
-  approved: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
-  rejected: 'bg-rose-500/20 text-rose-300 border border-rose-500/30',
+  pending: 'bg-muted text-foreground border border-border',
+  reviewed: 'bg-primary text-primary-foreground border-primary',
+  resolved: 'bg-success-bg text-success border border-success-border',
+  dismissed: 'bg-muted/60 text-foreground border border-border',
 }
 
 export default function ComplaintCard({ complaint }: ComplaintCardProps) {
@@ -34,8 +34,8 @@ export default function ComplaintCard({ complaint }: ComplaintCardProps) {
   })
 
   return (
-    <article className="overflow-hidden bg-surface backdrop-blur-2xl border border-border rounded-2xl shadow-xl active:scale-95 transition-all duration-200 cursor-pointer flex flex-col">
-      <div className="relative h-44 w-full bg-surface-solid/60 overflow-hidden">
+    <article className="overflow-hidden bg-card backdrop-blur-2xl border border-border rounded-2xl shadow-xl active:scale-95 transition-all duration-200 cursor-pointer flex flex-col">
+      <div className="relative h-44 w-full bg-muted/60 overflow-hidden">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={complaint.image_url}
@@ -51,17 +51,17 @@ export default function ComplaintCard({ complaint }: ComplaintCardProps) {
 
       <div className="p-6 flex flex-col flex-1 justify-between">
         <div>
-          <h2 className="text-base font-semibold tracking-tight text-primary">
+          <h2 className="text-base font-semibold tracking-tight text-foreground">
             {complaint.title}
           </h2>
-          <p className="mt-1.5 line-clamp-3 text-sm leading-relaxed text-muted">
+          <p className="mt-1.5 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
             {complaint.description}
           </p>
         </div>
 
         <div className="mt-4 pt-3 border-t border-border flex items-center justify-between">
-          <p className="text-xs font-medium text-muted">{formattedDate}</p>
-          {complaint.status !== 'approved' && (
+          <p className="text-xs font-medium text-muted-foreground">{formattedDate}</p>
+          {complaint.status !== 'resolved' && (
             <div>
               <ResolveButton complaintId={complaint.id} />
             </div>

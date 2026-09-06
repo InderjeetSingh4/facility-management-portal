@@ -18,24 +18,24 @@ export default async function AdminMetrics() {
   return (
     <div className="mb-10 grid gap-5 sm:grid-cols-3">
       {/* Card 1: Open Complaints */}
-      <div className="bg-white dark:bg-bg-surface border border-black/5 dark:border-white/10 rounded-[14px] p-6 transition-all hover:bg-black/5 dark:hover:bg-bg-surface-raised shadow-sm dark:shadow-none">
-        <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">Action Required</p>
-        <p className="mt-3 font-mono text-4xl font-bold tracking-tight text-primary dark:text-text-primary">{openComplaints}</p>
-        <p className="mt-1 text-xs font-medium text-muted dark:text-text-muted">Open Complaints</p>
+      <div className="bg-card border border-border rounded-[14px] p-6 transition-all hover:bg-muted shadow-sm">
+        <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted-foreground">Action Required</p>
+        <p className="mt-3 font-mono text-4xl font-bold tracking-tight text-foreground">{openComplaints}</p>
+        <p className="mt-1 text-xs font-medium text-muted-foreground">Open Complaints</p>
       </div>
       
       {/* Card 2: Resolved Complaints */}
-      <div className="bg-white dark:bg-bg-surface border border-black/5 dark:border-white/10 rounded-[14px] p-6 transition-all hover:bg-black/5 dark:hover:bg-bg-surface-raised shadow-sm dark:shadow-none">
-        <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">Completed</p>
-        <p className="mt-3 font-mono text-4xl font-bold tracking-tight text-primary dark:text-text-primary">{resolvedComplaints}</p>
-        <p className="mt-1 text-xs font-medium text-muted dark:text-text-muted">Resolved Complaints</p>
+      <div className="bg-card border border-border rounded-[14px] p-6 transition-all hover:bg-muted shadow-sm">
+        <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted-foreground">Completed</p>
+        <p className="mt-3 font-mono text-4xl font-bold tracking-tight text-foreground">{resolvedComplaints}</p>
+        <p className="mt-1 text-xs font-medium text-muted-foreground">Resolved Complaints</p>
       </div>
 
       {/* Card 3: Active Notices */}
-      <div className="bg-white dark:bg-bg-surface border border-black/5 dark:border-white/10 rounded-[14px] p-6 transition-all hover:bg-black/5 dark:hover:bg-bg-surface-raised shadow-sm dark:shadow-none">
-        <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted dark:text-text-muted">Broadcasts</p>
-        <p className="mt-3 font-mono text-4xl font-bold tracking-tight text-primary dark:text-text-primary">{totalNotices || 0}</p>
-        <p className="mt-1 text-xs font-medium text-muted dark:text-text-muted">Active Notices</p>
+      <div className="bg-card border border-border rounded-[14px] p-6 transition-all hover:bg-muted shadow-sm">
+        <p className="font-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[1px] text-muted-foreground">Broadcasts</p>
+        <p className="mt-3 font-mono text-4xl font-bold tracking-tight text-foreground">{totalNotices || 0}</p>
+        <p className="mt-1 text-xs font-medium text-muted-foreground">Active Notices</p>
       </div>
     </div>
   )

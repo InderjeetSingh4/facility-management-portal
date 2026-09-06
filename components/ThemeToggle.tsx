@@ -1,8 +1,8 @@
 'use client'
 
 import { useTheme } from 'next-themes'
-import { Sun, Moon } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { Sun, Moon } from 'lucide-react'
 
 export default function ThemeToggle() {
   const { theme, setTheme, resolvedTheme } = useTheme()
@@ -12,7 +12,9 @@ export default function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <div className="h-8 w-8 rounded-full border border-neutral-200/60 bg-white/40" />
+      <div 
+        className="w-[52px] h-[28px] rounded-full shrink-0 bg-muted" 
+      />
     )
   }
 
@@ -22,20 +24,19 @@ export default function ThemeToggle() {
     <button
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      className="relative p-2 rounded-full border border-neutral-200/60 bg-white/40 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 dark:border-neutral-800/60 dark:bg-neutral-900/40 dark:hover:bg-neutral-900/80"
+      role="switch"
+      aria-checked={isDark}
+      className={`relative flex items-center px-[2px] w-[52px] h-[28px] rounded-full focus:outline-none shrink-0 outline-none transition-all duration-300 ${isDark ? 'bg-primary dark:bg-transparent dark:bg-[var(--toggle-active-bg)] border-transparent dark:border dark:border-[var(--toggle-border)]' : 'bg-muted border border-transparent'}`}
     >
-      <Sun
-        className={`h-4 w-4 text-neutral-600 transition-all duration-300 ${
-          isDark ? 'rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100'
-        }`}
-        style={{ position: isDark ? 'absolute' : 'relative' }}
-      />
-      <Moon
-        className={`h-4 w-4 text-neutral-400 transition-all duration-300 ${
-          isDark ? 'rotate-0 scale-100 opacity-100' : '-rotate-90 scale-0 opacity-0'
-        }`}
-        style={{ position: isDark ? 'relative' : 'absolute' }}
-      />
+      <div
+        className={`flex items-center justify-center w-[22px] h-[22px] rounded-full shadow-sm bg-primary-foreground transition-transform duration-300 ${isDark ? 'translate-x-[24px]' : 'translate-x-0'}`}
+      >
+        {isDark ? (
+          <Moon size={13} className="text-primary" strokeWidth={2.5} />
+        ) : (
+          <Sun size={13} className="text-muted-foreground" strokeWidth={2.5} />
+        )}
+      </div>
     </button>
   )
 }
